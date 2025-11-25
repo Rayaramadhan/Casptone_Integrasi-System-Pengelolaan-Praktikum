@@ -21,14 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'image',
     ];
-
-    public function userAddress()
-    {
-        return $this->hasOne(UserAddress::class);
-    }
-
 
     /**
      * The attributes that should be hidden for serialization.
@@ -52,9 +45,4 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    public function favorites()
-    {
-    return $this->hasMany(Favorite::class);
-    }
-
 }
