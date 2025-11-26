@@ -7,6 +7,7 @@ use App\Http\Controllers\Laboran\LaboranController;
 use App\Http\Controllers\Asprak\AsprakController;
 use App\Http\Controllers\Dosen\DosenController;
 use App\Http\Controllers\Asprak\NilaiController;
+use App\Http\Controllers\Asprak\PresensiController;
 use App\Http\Controllers\Praktikan\PraktikanController;
 
 // ===============================
@@ -90,4 +91,13 @@ Route::middleware(['auth'])->group(function () {
     ->name('asprak.nilai.index');
     Route::post('/asprak/nilai', [NilaiController::class, 'store'])
         ->name('asprak.nilai.store');
+
+    //route presensi
+    Route::get('/presensi', [PresensiController::class, 'index'])->name('presensi');
+
+    Route::post('/presensi/checkin', [PresensiController::class, 'checkin'])
+        ->name('presensi.checkin');
+
+    Route::post('/presensi/checkout', [PresensiController::class, 'checkout'])
+        ->name('presensi.checkout');
     });
