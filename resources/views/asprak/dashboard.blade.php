@@ -285,7 +285,7 @@
             <!-- Bottom row -->
             <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 justify-items-center">
               <!-- Tukar Shift -->
-              <a href="#"
+              <a href="/tukar-shift"
                  class="w-full max-w-[230px] bg-gradient-to-b from-slate-50 to-white border border-teal-50 rounded-2xl shadow-sm
                         flex flex-col items-center py-4 px-3 hover:-translate-y-1 hover:shadow-md
                         hover:border-teal-300 transition duration-150 group">

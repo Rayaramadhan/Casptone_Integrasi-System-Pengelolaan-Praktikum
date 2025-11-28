@@ -169,87 +169,76 @@
 
         <h2 class="text-lg font-semibold mb-3">Jadwal Saat Ini</h2>
 
-        <div class="grid grid-cols-2 gap-4">
-            <div class="border rounded-xl p-4 bg-blue-50">
-                <p class="font-bold">Kamis, 23 Okt 2025</p>
-                <p class="text-sm mt-2">06.30 – 09.30</p>
-                <p class="text-xs text-gray-500">SHIFT 3 (SI-48-06)</p>
-            </div>
-
-            <div class="border rounded-xl p-4 bg-blue-50">
-                <p class="font-bold">Kamis, 23 Okt 2025</p>
-                <p class="text-sm mt-2">15.30 – 18.30</p>
-                <p class="text-xs text-gray-500">SHIFT 5 (SI-46-07)</p>
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            @foreach($myShifts as $shift)
+            <label class="border-2 border-blue-200 rounded-xl p-6 cursor-pointer hover:bg-blue-50 transition">
+                <input type="radio" name="my_shift" class="hidden" 
+                       data-date="{{ $shift['date'] }}" 
+                       data-time="{{ $shift['time'] }}" 
+                       data-code="{{ $shift['code'] }}">
+                <p class="font-bold text-lg text-blue-600">{{ \Carbon\Carbon::parse($shift['date'])->translatedFormat('l, d M Y') }}</p>
+                <p class="text-2xl font-bold text-blue-600 mt-2">{{ $shift['time'] }}</p>
+                <p class="text-sm text-gray-500">{{ $shift['code'] }}</p>
+            </label>
+            @endforeach
         </div>
 
         <hr class="my-6 border-gray-300">
-        <h2 class="text-lg font-semibold mb-3">Cari Jadwal Baru</h2>
-
-        <div class="grid grid-cols-2 gap-6">
-
-            <!-- Pilih Nama -->
+        
+        <h2 class="text-xl font-semibold mb-6">Cari Jadwal Baru</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-                <label class="block mb-1 text-sm font-medium">Pilih Nama</label>
-                <select id="namaBaru"
-                    class="w-full border p-2 rounded-lg">
+                <label class="block font-medium mb-2">Pilih Nama</label>
+                <select id="target_user_id" class="w-full border rounded-lg p-3">
                     <option value="">-- Pilih Nama --</option>
-                    <option>Raya Ramadhan</option>
-                    <option>Kamalia</option>
-                    <option>Handra</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                    @endforeach
                 </select>
             </div>
 
-            <!-- Pilih Tanggal -->
             <div>
-                <label class="block mb-1 text-sm font-medium">Tanggal</label>
-                <input id="tanggalBaru" type="date"
-                    class="w-full border p-2 rounded-lg">
+                <label class="block font-medium mb-2">Tanggal</label>
+                <input type="date" id="target_date" class="w-full border rounded-lg p-3">
             </div>
 
-            <!-- Pilih Jam -->
             <div>
-                <label class="block mb-1 text-sm font-medium">Jam Baru</label>
-                <select id="jamBaru"
-                    class="w-full border p-2 rounded-lg">
+                <label class="block font-medium mb-2">Jam</label>
+                <select id="target_time" class="w-full border rounded-lg p-3">
                     <option value="">-- Pilih Jam --</option>
-                    <option value="06.30 – 09.30">06.30 – 09.30</option>
-                    <option value="12.30 – 15.30">12.30 – 15.30</option>
-                    <option value="15.30 – 18.30">15.30 – 18.30</option>
+                    <option value="06.30 - 09.30">06.30 – 09.30</option>
+                    <option value="09.30 - 12.30">09.30 – 12.30</option>
+                    <option value="12.30 - 15.30">12.30 – 15.30</option>
+                    <option value="15.30 - 18.30">15.30 – 18.30</option>
                 </select>
             </div>
 
-            <!-- Pesan -->
             <div>
-                <label class="block mb-1 text-sm font-medium">Pesan (Opsional)</label>
-                <textarea id="pesanBaru"
-                    class="w-full border p-2 rounded-lg h-24"
-                    placeholder="Tulis pesan..."></textarea>
+                <label class="block font-medium mb-2">Kode Shift</label>
+                <input type="text" id="target_shift_code" placeholder="ex: SHIFT 4 (SI-46-09)" class="w-full border rounded-lg p-3">
             </div>
-
         </div>
 
-        <!-- Tombol Kirim -->
-        <div class="mt-6 flex justify-end">
-            <button id="btnKirim"
-                class="bg-teal-500 text-white px-6 py-2 rounded-lg hover:bg-teal-600">
+        <div class="mt-6">
+            <label class="block font-medium mb-2">Pesan (Opsional)</label>
+            <textarea id="message" class="w-full border rounded-lg p-3 h-32" placeholder="Tulis alasan tukar shift..."></textarea>
+        </div>
+
+        <div class="mt-8 flex justify-end">
+            <button id="btnKirim" class="bg-teal-500 text-white px-8 py-4 rounded-lg text-lg hover:bg-teal-600 transition">
                 Kirim Permintaan →
             </button>
         </div>
     </div>
 </div>
 
-<div id="modalSukses"
-     class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center">
-
-    <div class="bg-white p-6 w-80 rounded-xl text-center shadow-lg">
-        <h3 class="font-bold text-lg mb-2">Permintaan Terkirim!</h3>
-        <p class="text-gray-600 mb-5">
-            Permintaan tukar shift berhasil dikirim.
-        </p>
-
-        <button id="btnModalOk"
-            class="bg-teal-500 text-white px-4 py-2 w-full rounded-lg hover:bg-teal-600">
+<!-- Modal Sukses -->
+<div id="modalSukses" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+    <div class="bg-white p-10 rounded-2xl shadow-2xl text-center max-w-md">
+        <h3 class="text-3xl font-bold mb-4">Permintaan Terkirim!</h3>
+        <p class="text-gray-600 mb-8">Permintaan tukar shift berhasil dikirim.</p>
+        <button onclick="window.location.href='{{ route('tukar_shift') }}'" 
+                class="bg-teal-500 text-white px-8 py-4 rounded-lg w-full text-lg">
             OK
         </button>
     </div>
@@ -263,5 +252,49 @@
         </p>
         </div>
     </footer>
+
+    <script>
+    document.querySelectorAll('input[name="my_shift"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.querySelectorAll('label').forEach(l => l.classList.remove('border-blue-500', 'bg-blue-50'));
+            this.parentElement.classList.add('border-blue-500', 'bg-blue-50');
+        });
+    });
+
+    document.getElementById('btnKirim').addEventListener('click', function() {
+        const selectedMyShift = document.querySelector('input[name="my_shift"]:checked');
+        if (!selectedMyShift) return alert('Pilih jadwal kamu dulu!');
+
+        const data = {
+            my_shift_date: selectedMyShift.dataset.date,
+            my_shift_time: selectedMyShift.dataset.time,
+            my_shift_code: selectedMyShift.dataset.code,
+            target_user_id: document.getElementById('target_user_id').value,
+            target_date: document.getElementById('target_date').value,
+            target_time: document.getElementById('target_time').value,
+            target_shift_code: document.getElementById('target_shift_code').value,
+            message: document.getElementById('message').value,
+        };
+
+        if (!data.target_user_id || !data.target_date || !data.target_time) {
+            return alert('Lengkapi semua field!');
+        }
+
+        fetch("{{ route('request-shift.store') }}", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (res.success) {
+                document.getElementById('modalSukses').classList.remove('hidden');
+            }
+        });
+    });
+    </script>
 </body>
 </html>

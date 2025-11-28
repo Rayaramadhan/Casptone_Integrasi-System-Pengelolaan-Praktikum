@@ -8,6 +8,7 @@ use App\Http\Controllers\Asprak\AsprakController;
 use App\Http\Controllers\Dosen\DosenController;
 use App\Http\Controllers\Asprak\NilaiController;
 use App\Http\Controllers\Asprak\PresensiController;
+use App\Http\Controllers\Asprak\ShiftExchangeController;
 use App\Http\Controllers\Praktikan\PraktikanController;
 
 // ===============================
@@ -100,4 +101,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/presensi/checkout', [PresensiController::class, 'checkout'])
         ->name('presensi.checkout');
+
+    //route tukar shift
+    Route::get('/tukar-shift', [ShiftExchangeController::class, 'index'])->name('tukar_shift');
+    Route::get('/request-shift', [ShiftExchangeController::class, 'create'])->name('request-shift.create');
+    Route::post('/request-shift', [ShiftExchangeController::class, 'store'])->name('request-shift.store');
+    Route::post('/shift-exchange/take', [ShiftExchangeController::class, 'take'])->name('shift-exchange.take');
     });

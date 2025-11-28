@@ -13,10 +13,11 @@ class PresensiController extends Controller
     {
         $today = today()->toDateString();
 
-        // data hari ini (jika sudah ada)
-        $todayPresensi = Presensi::where('user_id', Auth::id())
-            ->where('tanggal', $today)
-            ->first();
+        // ambil semua presensi hari ini
+        $todayPresensis = Presensi::where('user_id', auth()->id())
+            ->whereDate('tanggal', today())
+            ->orderBy('check_in_at')
+            ->get();
 
         // riwayat (max 30 hari terakhir)
         $history = Presensi::where('user_id', Auth::id())
@@ -25,7 +26,7 @@ class PresensiController extends Controller
             ->limit(50)
             ->get();
 
-        return view('asprak.presensi_asprak', compact('todayPresensi', 'history'));
+        return view('asprak.presensi_asprak', compact('todayPresensis', 'history'));
     }
 
     public function checkin(Request $request)
@@ -72,23 +73,19 @@ class PresensiController extends Controller
     public function checkout(Request $request)
     {
         $request->validate([
-            'shift' => 'required|string',
+            'presensi_id' => 'required|exists:presensis,id'
         ]);
 
-        $today = today()->toDateString();
-
-        $presensi = Presensi::where('user_id', Auth::id())
-            ->where('tanggal', $today)
-            ->where('shift', $request->shift)
+        $presensi = Presensi::where('id', $request->presensi_id)
+            ->where('user_id', auth()->id())
             ->whereNotNull('check_in_at')
+            ->whereNull('check_out_at')
             ->firstOrFail();
 
-        if ($presensi->check_out_at) {
-            return back()->with('error', 'Kamu sudah check-out untuk shift ini.');
-        }
+        $presensi->update([
+            'check_out_at' => now()
+        ]);
 
-        $presensi->update(['check_out_at' => now()]);
-
-        return back()->with('success', 'Check-out berhasil!');
+        return back()->with('success', 'Check-out berhasil untuk shift ' . $presensi->shift);
     }
 }

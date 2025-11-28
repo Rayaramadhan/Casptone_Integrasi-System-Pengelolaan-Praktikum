@@ -236,32 +236,35 @@
             
         </form>
 
-        {{-- Tombol Check-out --}}
-        <form id="formCheckout" action="{{ route('presensi.checkout') }}" method="POST">
-            @csrf
-
-            @if($todayPresensi && $todayPresensi->check_in_at && !$todayPresensi->check_out_at)
-                <input type="hidden" name="shift" value="{{ $todayPresensi->shift }}">
+        @php
+            $activePresensi = $todayPresensis->first(function($p) {
+                return $p->check_in_at && !$p->check_out_at;
+            });
+        @endphp
+        
+        @if($activePresensi)
+            <form id="formCheckout" action="{{ route('presensi.checkout') }}" method="POST">
+                @csrf
+                <input type="hidden" name="presensi_id" value="{{ $activePresensi->id }}">
                 <button type="submit" 
-                    id="btnCheckout" 
-                    class="w-full py-3 bg-gray-300 text-gray-700 rounded-xl font-semibold">
-                    Check-out
+                        id="btnCheckout" 
+                        class="w-full py-3 bg-teal-600 text-white rounded-xl font-semibold hover:bg-teal-700 transition">
+                    Check-out Shift {{ $activePresensi->shift }}
                 </button>
-            @else
+            </form>
+        @else
                 <button type="button" disabled
-                    class="w-full py-3 bg-gray-400 text-gray-700 rounded-xl font-semibold cursor-not-allowed">
-                    @if($todayPresensi?->check_out_at)
-                        Sudah Check-out pada {{ $todayPresensi->check_out_at->format('H:i') }}
-                    @elseif($todayPresensi?->check_in_at)
-                        Belum bisa check-out (tunggu shift selesai)
+                        class="w-full py-3 bg-gray-400 text-gray-700 rounded-xl font-semibold cursor-not-allowed">
+                    @if($todayPresensis->count() == 0)
+                        Belum Check-in Hari Ini
+                    @elseif($todayPresensis->every->check_out_at)
+                        Semua Shift Sudah Check-out
                     @else
-                        Belum Check-in
+                        Tidak Ada Shift yang Bisa Di-Checkout
                     @endif
                 </button>
-            @endif
             </div>
-        </form>
-        
+        @endif
     </div>
     
     {{-- Status Kehadiran --}}
@@ -269,27 +272,45 @@
         
         <h2 class="text-lg font-bold mb-3">Status Kehadiran Kamu Hari Ini</h2>
 
-        @if ($todayPresensi)
-            {{-- Sudah Check-in --}}
-            @if ($todayPresensi->check_out_at)
-                <div class="bg-red-100 text-red-700 px-4 py-3 rounded-xl">
-                    Kamu sudah check-out pada {{ $todayPresensi->check_out_at->format('H:i') }}.
-                </div>
-            
-            @elseif ($todayPresensi->check_in_at)
-                <div class="bg-green-100 text-green-700 px-4 py-3 rounded-xl">
-                    Kamu sudah check-in pada {{ $todayPresensi->check_in_at->format('H:i') }}.
-                </div>
-            @endif
+        @if ($todayPresensis->count() > 0)
+            <div class="space-y-3">
+                @foreach($todayPresensis as $presensi)
+                    <div class="border rounded-lg p-4 {{ $presensi->check_out_at ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200' }}">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="font-semibold">{{ $presensi->shift }}</span><br>
+                                <small class="text-gray-600">
+                                    Check-in: {{ $presensi->check_in_at?->format('H:i') ?? 'Belum' }}
+                                    @if($presensi->check_out_at)
+                                        → Check-out: {{ $presensi->check_out_at->format('H:i') }}
+                                    @endif
+                                </small>
+                            </div>
 
-        @else
-        {{-- Belum ada presensi --}}
-            <div id="statusBox"
-                class="bg-teal-100 text-gray-700 px-4 py-3 rounded-xl">
-                ℹ️ Belum ada data kehadiran
+                            {{-- Tombol Check-out hanya muncul kalau sudah check-in tapi belum check-out --}}
+                            @if($presensi->check_in_at && !$presensi->check_out_at)
+                                <form action="{{ route('presensi.checkout') }}" method="POST" class="inline">
+                                    @csrf
+                                    <input type="hidden" name="presensi_id" value="{{ $presensi->id }}">
+                                    <button type="submit" 
+                                        class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700">
+                                        Check-out
+                                    </button>
+                                </form>
+                            @elseif(!$presensi->check_in_at)
+                                <span class="text-gray-500 text-sm">Menunggu Check-in</span>
+                            @else
+                                <span class="text-blue-600 font-semibold text-sm">Selesai</span>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
             </div>
-        @endif
-        
+        @else
+            <div class="bg-teal-100 text-gray-700 px-4 py-3 rounded-xl text-center">
+                Belum ada presensi hari ini
+            </div>
+        @endif 
     </div>
 
     {{-- Riwayat Kehadiran --}}

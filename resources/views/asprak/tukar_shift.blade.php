@@ -164,25 +164,45 @@
   <div class="p-10">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold">Data Permintaan Ganti Shift</h1>
-        <a href="/request_shift" id="btnRequestTukar"
-            class="flex items-center bg-teal-500 text-white px-4 py-2 rounded-lg">
+        <a href="{{ route('request-shift.create') }}" class="flex items-center bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600">
             Request Tukar
         </a>
     </div>
 
-    <!-- TABLE SHIFT -->
-    <table class="w-full bg-white shadow rounded-xl overflow-hidden">
-        <thead class="bg-gray-200">
-            <tr>
-                <th class="p-4 text-left">Nama</th>
-                <th class="p-4 text-left">Tanggal</th>
-                <th class="p-4 text-left">Jam</th>
-                <th class="p-4 text-left">Status</th>
-                <th class="p-4 text-left">Aksi</th>
-            </tr>
-        </thead>
-        <tbody id="tabelShift"></tbody>
-    </table>
+    <div class="bg-white shadow rounded-xl overflow-hidden">
+        <table class="w-full">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="p-4 text-left">Nama</th>
+                    <th class="p-4 text-left">Tanggal</th>
+                    <th class="p-4 text-left">Jam</th>
+                    <th class="p-4 text-left">Status</th>
+                    <th class="p-4 text-left"><input type="checkbox" id="checkAll"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($requests as $req)
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="p-4">{{ $req->requester->name }}</td>
+                    <td class="p-4">{{ \Carbon\Carbon::parse($req->requester_date)->format('d M Y') }}</td>
+                    <td class="p-4">{{ $req->requester_time }}</td>
+                    <td class="p-4">
+                        @if($req->isTaken())
+                        <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm">Sudah Diambil</span>
+                        @else
+                        <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">Tersedia</span>
+                        @endif
+                    </td>
+                    <td class="p-4">
+                        @if(!$req->isTaken())
+                        <input type="checkbox" class="shift-checkbox" value="{{ $req->id }}">
+                        @endif
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 
     <div class="flex justify-end mt-4">
         <button id="btnAmbil"
@@ -191,22 +211,20 @@
             Ambil
         </button>
     </div>
-</div>
+  </div>
 
-<div id="modalAmbil"
-     class="hidden fixed inset-0 bg-black/50 flex items-center justify-center backdrop-blur-sm">
-    <div class="bg-white p-6 w-80 rounded-xl text-center shadow-xl">
-        <h3 class="font-bold text-lg mb-3">Berhasil Diambil!</h3>
-        <p class="text-gray-600 mb-5">Shift telah berhasil kamu ambil.</p>
-
-        <button onclick="closeModalAmbil()"
-            class="bg-teal-500 text-white px-4 py-2 rounded-lg w-full hover:bg-teal-600">
-            OK
-        </button>
+    <!-- Modal Sukses Ambil -->
+    <div id="modalAmbil" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-xl shadow-2xl text-center max-w-sm">
+            <h3 class="text-2xl font-bold mb-3">Berhasil Mengambil Shift!</h3>
+            <p class="text-gray-600 mb-6">Silahkan cek di bagian menu</p>
+            <button onclick="location.reload()" class="bg-teal-500 text-white px-6 py-3 rounded-lg w-full">
+                OK
+            </button>
+        </div>
     </div>
-</div>
   
-  <!-- FOOTER -->
+    <!-- FOOTER -->
     <footer class="w-full mt-10">
         <div class="w-full bg-teal-500 text-center py-4">
         <p class="text-xs sm:text-sm font-medium text-white tracking-wide">
@@ -214,5 +232,45 @@
         </p>
         </div>
     </footer>
+
+    <script>
+    document.getElementById('checkAll').onclick = function() {
+        document.querySelectorAll('.shift-checkbox').forEach(cb => cb.checked = this.checked);
+        toggleAmbilButton();
+    };
+
+    document.querySelectorAll('.shift-checkbox').forEach(cb => {
+        cb.addEventListener('change', toggleAmbilButton);
+    });
+
+    function toggleAmbilButton() {
+        const checked = document.querySelectorAll('.shift-checkbox:checked').length > 0;
+        document.getElementById('btnAmbil').disabled = !checked;
+    }
+
+    document.getElementById('btnAmbil').onclick = function() {
+        const selected = document.querySelector('.shift-checkbox:checked');
+        if (!selected) return;
+
+        const id = selected.value;
+
+        fetch("{{ route('shift-exchange.take') }}", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ id })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('modalAmbil').classList.remove('hidden');
+            } else {
+                alert(data.message || 'Gagal mengambil shift');
+            }
+        });
+    };
+    </script>
 </body>
 </html>
