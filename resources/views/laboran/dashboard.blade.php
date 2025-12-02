@@ -210,7 +210,8 @@
         <!-- wrapper kartu -->
         <div class="rounded-[26px] bg-gradient-to-br from-teal-100/45 via-white to-emerald-100/60 p-[1px] shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
           <div class="bg-white/95 rounded-[24px] px-4 sm:px-8 py-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 justify-items-center">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-5 md:gap-6 justify-items-center">
+
 
               <!-- Dashboard -->
               <a href="#"
@@ -244,8 +245,24 @@
                 </p>
               </a>
 
-              <!-- Salary -->
+              <!-- Nilai -->
               <a href="#"
+                class="w-full max-w-[260px] bg-gradient-to-b from-slate-50 to-white border border-teal-50 rounded-2xl shadow-sm
+                        flex flex-col items-center py-5 px-4 hover:-translate-y-1 hover:shadow-md
+                        hover:border-teal-300 transition duration-150 group">
+                <div class="w-11 h-11 mb-2 flex items-center justify-center rounded-2xl
+                            bg-gradient-to-br from-teal-50 to-emerald-50
+                            border border-teal-100 text-xl group-hover:scale-110 group-hover:bg-teal-100/70 transition">
+                  🎓
+                </div>
+                <p class="text-sm md:text-base font-semibold text-slate-800">Nilai</p>
+                <p class="mt-1.5 text-[11px] text-slate-400 text-center">
+                  Kelola nilai asisten praktikum, lengkap dengan rekapan tiap kelas.
+                </p>
+              </a>
+
+              <!-- Salary -->
+              <a href="{{ route('laboran.salary.index') }}"
                  class="w-full max-w-[260px] bg-gradient-to-b from-slate-50 to-white border border-teal-50 rounded-2xl shadow-sm
                         flex flex-col items-center py-5 px-4 hover:-translate-y-1 hover:shadow-md
                         hover:border-teal-300 transition duration-150 group">

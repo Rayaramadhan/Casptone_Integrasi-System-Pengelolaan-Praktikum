@@ -317,7 +317,7 @@
               </a>
 
               <!-- Salary -->
-              <a href="#"
+              <a href="{{ route('asprak.salary.index') }}"
                  class="w-full max-w-[230px] bg-gradient-to-b from-slate-50 to-white border border-teal-50 rounded-2xl shadow-sm
                         flex flex-col items-center py-4 px-3 hover:-translate-y-1 hover:shadow-md
                         hover:border-teal-300 transition duration-150 group">

@@ -191,7 +191,7 @@
 
           {{-- Body form --}}
           <div class="px-6 lg:px-8 py-8">
-            <form action="{{ route('user.nilai.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+            <form action="{{ route('asprak.nilai.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
               @csrf
 
               {{-- Baris 1: Lab & Praktikum --}}
