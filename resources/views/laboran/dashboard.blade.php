@@ -229,8 +229,8 @@
                 </p>
               </a>
 
-              <!-- Report -->
-              <a href="#"
+              <!-- Assignment & Submission -->
+              <a href="{{ route('laboran.assignments.index') }}"
                  class="w-full max-w-[260px] bg-gradient-to-b from-slate-50 to-white border border-teal-50 rounded-2xl shadow-sm
                         flex flex-col items-center py-5 px-4 hover:-translate-y-1 hover:shadow-md
                         hover:border-teal-300 transition duration-150 group">
@@ -239,9 +239,25 @@
                             border border-teal-100 text-xl group-hover:scale-110 group-hover:bg-teal-100/70 transition">
                   📝
                 </div>
-                <p class="text-sm md:text-base font-semibold text-slate-800">Report</p>
+                <p class="text-sm md:text-base font-semibold text-slate-800">Penugasan</p>
                 <p class="mt-1.5 text-[11px] text-slate-400 text-center">
-                  Kelola dan arsipkan laporan praktikum, berita acara, dan dokumentasi lab.
+                  Buat penugasan untuk asprak (LPJ, RAB, Laporan, dll) dan review submission.
+                </p>
+              </a>
+
+              <!-- Resource Request -->
+              <a href="{{ route('laboran.resource-requests.index') }}"
+                 class="w-full max-w-[260px] bg-gradient-to-b from-slate-50 to-white border border-teal-50 rounded-2xl shadow-sm
+                        flex flex-col items-center py-5 px-4 hover:-translate-y-1 hover:shadow-md
+                        hover:border-teal-300 transition duration-150 group">
+                <div class="w-11 h-11 mb-2 flex items-center justify-center rounded-2xl
+                            bg-gradient-to-br from-teal-50 to-emerald-50
+                            border border-teal-100 text-xl group-hover:scale-110 group-hover:bg-teal-100/70 transition">
+                  📦
+                </div>
+                <p class="text-sm md:text-base font-semibold text-slate-800">Review Permintaan</p>
+                <p class="mt-1.5 text-[11px] text-slate-400 text-center">
+                  Kelola dan review kebutuhan praktikum dari asprak.
                 </p>
               </a>
 
@@ -282,6 +298,334 @@
         </div>
       </div>
     </section>
+
+
+    <!-- SUBMISSION REVIEW WIDGET -->
+    @if(isset($submissionStats) && $submissionStats['pending'] > 0)
+    <section class="py-14 md:py-16 bg-gradient-to-b from-[#f3fbfb] via-[#e8f7f6] to-[#e0ecff]">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="text-center mb-9">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-medium
+                       bg-white/80 text-teal-700 border border-teal-100 shadow-sm">
+            📋 Review Submission
+          </span>
+          <h2 class="mt-3 text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
+            Submission Pending Review
+          </h2>
+          <p class="mt-2 text-xs md:text-sm text-slate-500 max-w-xl mx-auto">
+            Kelola dan review submission penugasan yang diajukan oleh asprak
+          </p>
+        </div>
+
+        <!-- Submission Statistics Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <!-- Total Submissions -->
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs text-slate-500 mb-1">Total</p>
+                <p class="text-2xl font-bold text-slate-900">{{ $submissionStats['total'] }}</p>
+              </div>
+              <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                <span class="text-xl">📋</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pending -->
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs text-slate-500 mb-1">Pending</p>
+                <p class="text-2xl font-bold text-yellow-600">{{ $submissionStats['pending'] }}</p>
+              </div>
+              <div class="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center">
+                <span class="text-xl">⏳</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Approved -->
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs text-slate-500 mb-1">Disetujui</p>
+                <p class="text-2xl font-bold text-green-600">{{ $submissionStats['approved'] }}</p>
+              </div>
+              <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
+                <span class="text-xl">✅</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rejected -->
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs text-slate-500 mb-1">Ditolak</p>
+                <p class="text-2xl font-bold text-red-600">{{ $submissionStats['rejected'] }}</p>
+              </div>
+              <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
+                <span class="text-xl">❌</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Pending Submissions -->
+        @if(isset($recentPendingSubmissions) && $recentPendingSubmissions->count() > 0)
+        <div class="rounded-[26px] bg-gradient-to-r from-teal-100/50 via-white to-sky-100/60 p-[1px] shadow-[0_18px_45px_rgba(15,23,42,0.08)] mb-6">
+          <div class="bg-white/95 rounded-[24px] px-6 py-6">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-lg font-bold text-slate-900">⏳ Submission Pending (Terbaru)</h3>
+              <a href="{{ route('laboran.submissions.index') }}?status=pending" 
+                 class="text-sm text-teal-600 hover:text-teal-700 font-medium">
+                Lihat Semua →
+              </a>
+            </div>
+            <div class="space-y-3">
+              @foreach($recentPendingSubmissions as $submission)
+              <div class="flex items-center gap-4 p-4 bg-gradient-to-r from-yellow-50 to-white rounded-xl border border-yellow-100 hover:shadow-md transition">
+                <!-- File Icon -->
+                <div class="flex-shrink-0">
+                  <div class="w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center">
+                    <span class="text-lg">📄</span>
+                  </div>
+                </div>
+
+                <!-- Submission Info -->
+                <div class="flex-1 min-w-0">
+                  <h4 class="text-sm font-semibold text-slate-900 truncate">{{ $submission->assignment->judul }}</h4>
+                  <p class="text-xs text-slate-500 mt-0.5">
+                    Oleh: <span class="font-medium text-slate-700">{{ $submission->asprak->name }}</span>
+                  </p>
+                  <p class="text-[10px] text-slate-400 mt-1">
+                    Diajukan: {{ $submission->created_at->diffForHumans() }}
+                  </p>
+                </div>
+
+                <!-- Assignment Type -->
+                <div class="flex-shrink-0">
+                  <span class="px-3 py-1 text-[10px] font-medium rounded-full bg-blue-50 text-blue-700">
+                    {{ $submission->assignment->tipe }}
+                  </span>
+                </div>
+
+                <!-- Action -->
+                <div class="flex-shrink-0">
+                  <a href="{{ route('laboran.submissions.show', $submission) }}" 
+                     class="px-4 py-2 text-xs font-medium bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition">
+                    Review
+                  </a>
+                </div>
+              </div>
+              @endforeach
+            </div>
+          </div>
+        </div>
+        @endif
+
+        <!-- Expired Assignments Alert -->
+        @if(isset($expiredAssignments) && $expiredAssignments->count() > 0)
+        <div class="rounded-[26px] bg-gradient-to-r from-red-100/50 via-white to-orange-100/60 p-[1px] shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
+          <div class="bg-white/95 rounded-[24px] px-6 py-6">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-lg font-bold text-red-900">⚠️ Penugasan Melewati Deadline</h3>
+              <a href="{{ route('laboran.assignments.index') }}?expired=1" 
+                 class="text-sm text-red-600 hover:text-red-700 font-medium">
+                Lihat Semua →
+              </a>
+            </div>
+            <div class="space-y-3">
+              @foreach($expiredAssignments as $assignment)
+              <div class="flex items-center gap-4 p-4 bg-gradient-to-r from-red-50 to-white rounded-xl border border-red-100 hover:shadow-md transition">
+                <!-- Warning Icon -->
+                <div class="flex-shrink-0">
+                  <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
+                    <span class="text-lg">⚠️</span>
+                  </div>
+                </div>
+
+                <!-- Assignment Info -->
+                <div class="flex-1 min-w-0">
+                  <h4 class="text-sm font-semibold text-slate-900 truncate">{{ $assignment->judul }}</h4>
+                  <p class="text-xs text-slate-500 mt-0.5">
+                    Praktikum: <span class="font-medium text-slate-700">{{ $assignment->praktikum }}</span>
+                  </p>
+                  <p class="text-[10px] text-red-600 mt-1 font-medium">
+                    Deadline: {{ $assignment->deadline->format('d M Y') }} ({{ $assignment->deadline->diffForHumans() }})
+                  </p>
+                </div>
+
+                <!-- Type -->
+                <div class="flex-shrink-0">
+                  <span class="px-3 py-1 text-[10px] font-medium rounded-full bg-orange-50 text-orange-700">
+                    {{ $assignment->tipe }}
+                  </span>
+                </div>
+
+                <!-- Action -->
+                <div class="flex-shrink-0">
+                  <a href="{{ route('laboran.assignments.show', $assignment) }}" 
+                     class="px-4 py-2 text-xs font-medium bg-red-500 text-white rounded-lg hover:bg-red-600 transition">
+                    Detail
+                  </a>
+                </div>
+              </div>
+              @endforeach
+            </div>
+
+            <div class="mt-4 bg-red-50 border border-red-200 rounded-xl p-4">
+              <div class="flex items-start gap-3">
+                <span class="text-2xl">⚠️</span>
+                <div>
+                  <h4 class="text-sm font-bold text-red-800">Perhatian!</h4>
+                  <p class="text-xs text-red-700 mt-1">
+                    Terdapat <strong>{{ $assignmentStats['expired'] }} penugasan melewati deadline</strong>. 
+                    Pertimbangkan untuk menutup penugasan atau perpanjang deadline.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        @endif
+
+        <!-- Pending Resource Requests -->
+        @if(isset($pendingResourceRequests) && $pendingResourceRequests->count() > 0)
+        <div class="rounded-[26px] bg-gradient-to-r from-teal-100/50 via-white to-emerald-100/60 p-[1px] shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
+          <div class="bg-white/95 rounded-[24px] px-6 py-6">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-lg font-bold text-slate-900">📦 Permintaan Resource Menunggu Review</h3>
+              <a href="{{ route('laboran.resource-requests.index') }}" 
+                 class="text-sm text-teal-600 hover:text-teal-700 font-medium">
+                Lihat Semua →
+              </a>
+            </div>
+            <div class="space-y-3">
+              @foreach($pendingResourceRequests as $request)
+              <div class="flex items-center gap-4 p-4 bg-gradient-to-r from-slate-50 to-white rounded-xl border border-slate-100 hover:shadow-md transition">
+                <!-- Resource Icon -->
+                <div class="flex-shrink-0">
+                  <div class="w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center">
+                    <span class="text-lg">{{ $request->resource_type_icon }}</span>
+                  </div>
+                </div>
+
+                <!-- Request Info -->
+                <div class="flex-1 min-w-0">
+                  <h4 class="text-sm font-semibold text-slate-900 truncate">{{ $request->title }}</h4>
+                  <p class="text-xs text-slate-500 mt-0.5">
+                    Oleh: <span class="font-medium text-slate-700">{{ $request->user->name }}</span>
+                  </p>
+                  <p class="text-[10px] text-slate-400 mt-1">
+                    {{ $request->resource_type_label }} - Dibutuhkan: {{ $request->formatted_needed_date }}
+                  </p>
+                </div>
+
+                <!-- Priority -->
+                <div class="flex-shrink-0">
+                  <span class="px-3 py-1 text-[10px] font-medium rounded-full {{ $request->priority_color }}">
+                    {{ $request->priority_label }}
+                  </span>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex-shrink-0 flex gap-2">
+                  <a href="{{ route('laboran.resource-requests.show', $request) }}" 
+                     class="px-3 py-1.5 text-xs font-medium bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition">
+                    Review
+                  </a>
+                </div>
+              </div>
+              @endforeach
+            </div>
+
+            @if($resourceRequestStats['pending'] > 0)
+            <div class="mt-4 bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+              <div class="flex items-start gap-3">
+                <span class="text-2xl">⏳</span>
+                <div>
+                  <h4 class="text-sm font-bold text-yellow-800">Perlu Review</h4>
+                  <p class="text-xs text-yellow-700 mt-1">
+                    Terdapat <strong>{{ $resourceRequestStats['pending'] }} permintaan resource menunggu review</strong> Anda.
+                  </p>
+                </div>
+              </div>
+            </div>
+            @endif
+          </div>
+        </div>
+        @endif
+
+        <!-- Overdue Resource Requests Alert -->
+        @if(isset($overdueResourceRequests) && $overdueResourceRequests->count() > 0)
+        <div class="rounded-[26px] bg-gradient-to-r from-red-100/50 via-white to-orange-100/60 p-[1px] shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
+          <div class="bg-white/95 rounded-[24px] px-6 py-6">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-lg font-bold text-red-900">⚠️ Permintaan Resource Terlambat</h3>
+              <a href="{{ route('laboran.resource-requests.index') }}" 
+                 class="text-sm text-red-600 hover:text-red-700 font-medium">
+                Lihat Semua →
+              </a>
+            </div>
+            <div class="space-y-3">
+              @foreach($overdueResourceRequests as $request)
+              <div class="flex items-center gap-4 p-4 bg-gradient-to-r from-red-50 to-white rounded-xl border border-red-100 hover:shadow-md transition">
+                <!-- Warning Icon -->
+                <div class="flex-shrink-0">
+                  <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
+                    <span class="text-lg">⚠️</span>
+                  </div>
+                </div>
+
+                <!-- Request Info -->
+                <div class="flex-1 min-w-0">
+                  <h4 class="text-sm font-semibold text-slate-900 truncate">{{ $request->title }}</h4>
+                  <p class="text-xs text-slate-500 mt-0.5">
+                    Oleh: <span class="font-medium text-slate-700">{{ $request->user->name }}</span>
+                  </p>
+                  <p class="text-[10px] text-red-600 mt-1 font-medium">
+                    Dibutuhkan: {{ $request->formatted_needed_date }} ({{ $request->needed_date->diffForHumans() }})
+                  </p>
+                </div>
+
+                <!-- Priority -->
+                <div class="flex-shrink-0">
+                  <span class="px-3 py-1 text-[10px] font-medium rounded-full {{ $request->priority_color }}">
+                    {{ $request->priority_label }}
+                  </span>
+                </div>
+
+                <!-- Action -->
+                <div class="flex-shrink-0">
+                  <a href="{{ route('laboran.resource-requests.show', $request) }}" 
+                     class="px-4 py-2 text-xs font-medium bg-red-500 text-white rounded-lg hover:bg-red-600 transition">
+                    Review Sekarang
+                  </a>
+                </div>
+              </div>
+              @endforeach
+            </div>
+
+            <div class="mt-4 bg-red-50 border border-red-200 rounded-xl p-4">
+              <div class="flex items-start gap-3">
+                <span class="text-2xl">⚠️</span>
+                <div>
+                  <h4 class="text-sm font-bold text-red-800">Perhatian!</h4>
+                  <p class="text-xs text-red-700 mt-1">
+                    Terdapat <strong>{{ $resourceRequestStats['overdue'] }} permintaan resource terlambat</strong>. 
+                    Segera review karena tanggal kebutuhan sudah lewat.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        @endif
+      </div>
+    </section>
+    @endif
 
 
     <!-- LAB SISTEM INFORMASI -->

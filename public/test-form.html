@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Test Form</title>
+    </head>
+    <body>
+        <h1>Test POST Form</h1>
+        <form method="POST" action="/submissions/1/approve">
+            <input type="hidden" name="_token" value="test" />
+            <textarea name="feedback" required>
+Test feedback yang lebih dari 10 karakter</textarea
+            >
+            <button type="submit">Submit</button>
+        </form>
+
+        <script>
+            document
+                .querySelector("form")
+                .addEventListener("submit", function (e) {
+                    console.log("Form method:", this.method);
+                    console.log("Form action:", this.action);
+                    console.log("FormData:", new FormData(this));
+                });
+        </script>
+    </body>
+</html>

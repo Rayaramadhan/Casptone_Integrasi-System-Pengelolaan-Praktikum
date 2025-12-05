@@ -23,11 +23,12 @@
                 <!-- Navigation Links -->
                 @auth
                     @php
-                        $isAdmin   = auth()->user()->usertype === 'laboran';
-                        $isDash    = $isAdmin
+                        $isLaboran = auth()->user()->usertype === 'laboran';
+                        $isAsprak  = auth()->user()->usertype === 'asprak';
+                        $isDash    = $isLaboran
                             ? request()->routeIs('laboran.dashboard')
                             : request()->routeIs('asprak.dashboard');
-                        $dashRoute = $isAdmin ? route('laboran.dashboard') : route('asprak.dashboard');
+                        $dashRoute = $isLaboran ? route('laboran.dashboard') : route('asprak.dashboard');
                     @endphp
 
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
@@ -35,18 +36,22 @@
                             {{ __('Dashboard') }}
                         </x-nav-link>
 
-                        {{-- 
-                        // Contoh: menu tambahan admin
-                        @if ($isAdmin)
-                            <x-nav-link :href="route('admin.inputcatalog')" :active="request()->routeIs('admin.inputcatalog')">
-                                {{ __('Input Catalog') }}
+                        <x-nav-link :href="route($isLaboran ? 'laboran.resource-requests.index' : 'asprak.resource-requests.index')" :active="request()->routeIs('*.resource-requests.*')">
+                            {{ __('Kebutuhan Praktikum') }}
+                        </x-nav-link>
+
+                        @if ($isLaboran)
+                            <x-nav-link :href="route('laboran.assignments.index')" :active="request()->routeIs('laboran.assignments.*')">
+                                {{ __('Penugasan') }}
                             </x-nav-link>
-                        @else
-                            <x-nav-link :href="route('user.catalog')" :active="request()->routeIs('user.catalog')">
-                                {{ __('Catalog') }}
+                            <x-nav-link :href="route('laboran.submissions.index')" :active="request()->routeIs('laboran.submissions.*')">
+                                {{ __('Review Submission') }}
                             </x-nav-link>
-                        @endif 
-                        --}}
+                        @elseif ($isAsprak)
+                            <x-nav-link :href="route('asprak.submissions.index')" :active="request()->routeIs('asprak.submissions.*')">
+                                {{ __('Penugasan') }}
+                            </x-nav-link>
+                        @endif
                     </div>
                 @endauth
             </div>
@@ -128,6 +133,11 @@
                 <x-responsive-nav-link :href="$dashRoute"
                                        :active="request()->routeIs($dashRouteCheck)">
                     {{ __('Dashboard') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route($isAdmin ? 'laboran.resource-requests.index' : 'asprak.resource-requests.index')"
+                                       :active="request()->routeIs('*.resource-requests.*')">
+                    {{ __('Kebutuhan Praktikum') }}
                 </x-responsive-nav-link>
 
                 {{--
