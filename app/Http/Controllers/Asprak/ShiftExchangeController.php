@@ -5,17 +5,17 @@ namespace App\Http\Controllers\Asprak;
 use App\Http\Controllers\Controller;
 use App\Models\ShiftRequest;
 use Illuminate\Http\Request;
+use App\Notifications\ShiftSwapRequested;
+use App\Notifications\ShiftSwapResponded;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ShiftExchangeController extends Controller
 {
     public function index () {
         $requests = ShiftRequest::with(['requester', 'targetUser'])
+            ->where('target_user_id', Auth::id())
             ->where('status', 'pending')
-            ->orWhere(function ($q) {
-                $q->where('status', 'taken')
-                  ->where('taken_by', Auth::id());
-            })
             ->latest()
             ->get();
 
@@ -46,36 +46,95 @@ class ShiftExchangeController extends Controller
             'message' => 'nullable|string',
         ]);
 
-        ShiftRequest::create([
-            'requester_id' => Auth::id(),
-            'target_user_id' => $request->target_user_id,
-            'requester_date' => $request->my_shift_date,
-            'requester_time' => $request->my_shift_time,
+        $shiftRequest = ShiftRequest::create([
+            'requester_id'         => Auth::id(),
+            'target_user_id'       => $request->target_user_id,
+            'requester_date'       => $request->my_shift_date,
+            'requester_time'       => $request->my_shift_time,
             'requester_shift_code' => $request->my_shift_code,
-            'target_date' => $request->target_date,
-            'target_time' => $request->target_time,
-            'target_shift_code' => $request->target_shift_code,
-            'message' => $request->message,
-            'status' => 'pending',
+            'target_date'          => $request->target_date,
+            'target_time'          => $request->target_time,
+            'target_shift_code'    => $request->target_shift_code,
+            'message'              => $request->message,
+            'status'               => 'pending',
         ]);
+
+        // Kirim notifikasi ke orang yang dituju (kalau user masih ada)
+        $targetUser = \App\Models\User::find($request->target_user_id);
+        if ($targetUser) {
+            $targetUser->notify(new ShiftSwapRequested($shiftRequest));
+        }
 
         return response()->json(['success' => true]);
     }
 
-    public function take(Request $request)
+    public function accept(Request $request)
     {
-        $shiftRequest = ShiftRequest::findOrFail($request->id);
+        $shiftRequest = ShiftRequest::where('target_user_id', Auth::id())
+            ->where('id', $request->id)
+            ->where('status', 'pending')
+            ->firstOrFail();
 
-        if ($shiftRequest->status === 'taken') {
-            return response()->json(['success' => false, 'message' => 'Sudah diambil orang lain']);
+        DB::transaction(function () use ($shiftRequest) {
+            $shiftRequest->update([
+                'status'    => 'accepted',
+                'taken_by'  => Auth::id(),
+                'taken_at'  => now(),
+            ]);
+
+            // HANYA kirim notif ke requester (bukan ke diri sendiri)
+            $requester = User::find($shiftRequest->requester_id);
+            if ($requester && $requester->id !== Auth::id()) {
+                $requester->notify(new ShiftSwapResponded($shiftRequest, 'diterima'));
+            }
+        });
+
+        return redirect()->back()->with('success', 'Shift berhasil ditukar!');
+    }
+
+    /**
+     * Tolak permintaan
+     */
+    public function reject(Request $request)
+    {
+        $shiftRequest = ShiftRequest::where('target_user_id', Auth::id())
+            ->where('id', $request->id)
+            ->where('status', 'pending')
+            ->firstOrFail();
+
+        $shiftRequest->update(['status' => 'rejected']);
+
+        // Notifikasi ke requester (aman dari null)
+        $requester = User::find($shiftRequest->requester_id);
+        if ($requester && $requester->id !== Auth::id()) {
+            $requester->notify(new ShiftSwapResponded($shiftRequest, 'ditolak'));
         }
 
-        $shiftRequest->update([
-            'status' => 'taken',
-            'taken_by' => Auth::id(),
-            'taken_at' => now(),
-        ]);
+        return redirect()->back()->with('success', 'Permintaan telah ditolak');
+    }
 
+    public function notifications()
+    {
+        // Tandai semua sebagai sudah dibaca saat buka halaman
+        Auth::user()->unreadNotifications->markAsRead();
+
+        $notifications = Auth::user()
+            ->notifications()
+            ->latest()
+            ->paginate(15);
+
+        return view('asprak.notifications', compact('notifications'));
+    }
+
+    public function markAsRead($id)
+    {
+        Auth::user()->notifications()->where('id', $id)->update(['read_at' => now()]);
         return response()->json(['success' => true]);
+    }
+
+    public function markAllRead()
+    {
+        Auth::user()->unreadNotifications->markAsRead();
+        return back()->with('success', 'Semua notifikasi ditandai sudah dibaca');
     }
 }

@@ -107,6 +107,24 @@
                 </div>
             </div>
 
+            <!-- Lonceng Notifikasi + Badge Merah-->
+            <a href="{{ route('notifications') }}" class="relative mx-3">
+                <svg class="w-7 h-7 text-gray-700 hover:text-teal-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                </svg>
+
+                @php
+                    $unreadCount = Auth::user()->unreadNotifications->count();
+                @endphp
+
+                @if($unreadCount > 0)
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center animate-pulse shadow-lg">
+                        {{ $unreadCount > 99 ? '99+' : $unreadCount }}
+                    </span>
+                @endif
+            </a>
+
             {{-- MOBILE: versi ringkas --}}
             <div class="flex md:hidden items-center gap-2 mr-2">
                 <div class="text-right leading-tight mr-1">
@@ -138,6 +156,17 @@
                            text-[11px] font-semibold shadow-sm">
                     {{ $initial }}
                 </div>
+
+                <a href="{{ route('notifications') }}" class="relative">
+                    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1-1m-4 0V7m-4 10h-5l1-1m4 0V7m4 10V7"></path>
+                    </svg>
+                    @if(Auth::user()->unreadNotifications->count() > 0)
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center">
+                            {{ Auth::user()->unreadNotifications->count() }}
+                        </span>
+                    @endif
+                </a>
             </div>
         @else
             <!-- Kalau belum login: seperti header welcome (Login + Daftar) -->

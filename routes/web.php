@@ -181,7 +181,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tukar-shift', [ShiftExchangeController::class, 'index'])->name('tukar_shift');
     Route::get('/request-shift', [ShiftExchangeController::class, 'create'])->name('request-shift.create');
     Route::post('/request-shift', [ShiftExchangeController::class, 'store'])->name('request-shift.store');
-    Route::post('/shift-exchange/take', [ShiftExchangeController::class, 'take'])->name('shift-exchange.take');
+    Route::post('/shift-exchange/accept', [ShiftExchangeController::class, 'accept'])
+        ->name('shift-exchange.accept');
+    Route::post('/shift-exchange/reject', [ShiftExchangeController::class, 'reject'])
+        ->name('shift-exchange.reject');
+
+    Route::get('/notifications', [ShiftExchangeController::class, 'notifications'])
+     ->name('notifications')
+     ->middleware('auth');
+
 
     // 👉 SALARY – POV ASPRAK (lihat gaji sendiri)
     Route::get('/asprak/salary', [AsprakSalaryController::class, 'index'])

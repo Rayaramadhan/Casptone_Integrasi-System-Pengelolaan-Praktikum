@@ -254,47 +254,87 @@
     </footer>
 
     <script>
+    // 1. Highlight radio yang dipilih
     document.querySelectorAll('input[name="my_shift"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            document.querySelectorAll('label').forEach(l => l.classList.remove('border-blue-500', 'bg-blue-50'));
-            this.parentElement.classList.add('border-blue-500', 'bg-blue-50');
+        radio.addEventListener('change', function () {
+            document.querySelectorAll('label[for]').forEach(label => {
+                label.classList.remove('border-blue-500', 'bg-blue-50');
+            });
+            if (this.id) {
+                document.querySelector(`label[for="${this.id}"]`)?.classList.add('border-blue-500', 'bg-blue-50');
+            }
         });
     });
 
-    document.getElementById('btnKirim').addEventListener('click', function() {
+    // 2. Kirim permintaan
+    document.getElementById('btnKirim').addEventListener('click', function (e) {
+        e.preventDefault(); // safety
+
+        // Pastikan ada yang dipilih
         const selectedMyShift = document.querySelector('input[name="my_shift"]:checked');
-        if (!selectedMyShift) return alert('Pilih jadwal kamu dulu!');
+        if (!selectedMyShift) {
+            alert('Pilih jadwal kamu dulu!');
+            return;
+        }
+
+        // Ambil data dari dataset (pastikan di HTML ada data-xxx)
+        const myDate = selectedMyShift.dataset.date;
+        const myTime = selectedMyShift.dataset.time;
+        const myCode = selectedMyShift.dataset.code;
+
+        if (!myDate || !myTime || !myCode) {
+            console.error('Radio button tidak punya data-date/time/code!', selectedMyShift);
+            alert('Error: data shift tidak lengkap. Hubungi admin.');
+            return;
+        }
 
         const data = {
-            my_shift_date: selectedMyShift.dataset.date,
-            my_shift_time: selectedMyShift.dataset.time,
-            my_shift_code: selectedMyShift.dataset.code,
+            my_shift_date: myDate,
+            my_shift_time: myTime,
+            my_shift_code: myCode,
             target_user_id: document.getElementById('target_user_id').value,
             target_date: document.getElementById('target_date').value,
             target_time: document.getElementById('target_time').value,
             target_shift_code: document.getElementById('target_shift_code').value,
-            message: document.getElementById('message').value,
+            message: document.getElementById('message').value.trim(),
         };
 
-        if (!data.target_user_id || !data.target_date || !data.target_time) {
-            return alert('Lengkapi semua field!');
+        // Validasi field wajib
+        if (!data.target_user_id || !data.target_date || !data.target_time || !data.target_shift_code) {
+            alert('Lengkapi semua field Cari Jadwal Baru!');
+            return;
         }
+
+        // Disable tombol + loading
+        this.disabled = true;
+        this.innerHTML = 'Mengirim...';
 
         fetch("{{ route('request-shift.store') }}", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
             },
             body: JSON.stringify(data)
         })
-        .then(r => r.json())
+        .then(response => response.json())
         .then(res => {
             if (res.success) {
                 document.getElementById('modalSukses').classList.remove('hidden');
+            } else {
+                alert(res.message || 'Gagal mengirim permintaan');
             }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Terjadi kesalahan jaringan');
+        })
+        .finally(() => {
+            this.disabled = false;
+            this.innerHTML = 'Kirim Permintaan';
         });
     });
-    </script>
+</script>
 </body>
 </html>

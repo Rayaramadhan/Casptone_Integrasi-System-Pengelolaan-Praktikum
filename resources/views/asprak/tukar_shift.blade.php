@@ -106,6 +106,8 @@
                 </div>
             </div>
 
+            
+
             {{-- MOBILE: versi ringkas --}}
             <div class="flex md:hidden items-center gap-2 mr-2">
                 <div class="text-right leading-tight mr-1">
@@ -161,68 +163,92 @@
     </div>
   </header>
 
-  <div class="p-10">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">Data Permintaan Ganti Shift</h1>
-        <a href="{{ route('request-shift.create') }}" class="flex items-center bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600">
-            Request Tukar
+  @if(session('success'))
+    <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-xl">
+        {{ session('success') }}
+    </div>
+@endif
+  <div class="p-6 md:p-10 flex-1">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Permintaan Tukar Shift Masuk</h1>
+            <p class="text-gray-600 mt-1">Tinjau dan respon permintaan dari rekan asisten</p>
+        </div>
+        <a href="{{ route('request-shift.create') }}"
+           class="bg-teal-500 text-white px-5 py-3 rounded-xl hover:bg-teal-600 transition flex items-center gap-2 shadow-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Request Tukar Shift
         </a>
     </div>
 
-    <div class="bg-white shadow rounded-xl overflow-hidden">
-        <table class="w-full">
-            <thead class="bg-gray-200">
-                <tr>
-                    <th class="p-4 text-left">Nama</th>
-                    <th class="p-4 text-left">Tanggal</th>
-                    <th class="p-4 text-left">Jam</th>
-                    <th class="p-4 text-left">Status</th>
-                    <th class="p-4 text-left"><input type="checkbox" id="checkAll"></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($requests as $req)
-                <tr class="border-b hover:bg-gray-50">
-                    <td class="p-4">{{ $req->requester->name }}</td>
-                    <td class="p-4">{{ \Carbon\Carbon::parse($req->requester_date)->format('d M Y') }}</td>
-                    <td class="p-4">{{ $req->requester_time }}</td>
-                    <td class="p-4">
-                        @if($req->isTaken())
-                        <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm">Sudah Diambil</span>
-                        @else
-                        <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">Tersedia</span>
-                        @endif
-                    </td>
-                    <td class="p-4">
-                        @if(!$req->isTaken())
-                        <input type="checkbox" class="shift-checkbox" value="{{ $req->id }}">
-                        @endif
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
+    <div class="space-y-6">
+        @forelse($requests as $req)
+            <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition">
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-teal-500 text-white flex items-center justify-center font-bold text-lg">
+                            {{ strtoupper(substr($req->requester->name, 0, 1)) }}
+                        </div>
+                        <div>
+                            <p class="font-semibold text-lg">{{ $req->requester->name }}</p>
+                            <p class="text-sm text-gray-500">Meminta tukar shift</p>
+                        </div>
+                    </div>
+                    @if($req->isPending())
+                        <span class="bg-yellow-100 text-yellow-800 px-4 py-1 rounded-full text-sm">Pending</span>
+                    @elseif($req->isAccepted())
+                        <span class="bg-green-100 text-green-800 px-4 py-1 rounded-full text-sm">Diterima</span>
+                    @endif
+                </div>
 
-    <div class="flex justify-end mt-4">
-        <button id="btnAmbil"
-            class="bg-teal-400 text-white px-4 py-2 rounded-lg disabled:bg-gray-300 disabled:text-gray-600"
-            disabled>
-            Ambil
-        </button>
-    </div>
-  </div>
+                <!-- Detail shift -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="border rounded-xl p-4 bg-teal-50">
+                        <p class="text-sm font-medium text-teal-700">Shift Anda (Yang di-request)</p>
+                        <p class="font-bold">{{ \Carbon\Carbon::parse($req->target_date)->translatedFormat('l, d M Y') }}</p>
+                        <p class="text-xl font-bold text-teal-600">{{ $req->target_time }}</p>
+                        <p class="text-sm text-gray-600">{{ $req->target_shift_code }}</p>
+                    </div>
+                    <div class="border rounded-xl p-4 bg-orange-50">
+                        <p class="text-sm font-medium text-orange-700">Shift {{ $req->requester->name }} (Yang di-accept)</p>
+                        <p class="font-bold">{{ \Carbon\Carbon::parse($req->requester_date)->translatedFormat('l, d M Y') }}</p>
+                        <p class="text-xl font-bold text-orange-600">{{ $req->requester_time }}</p>
+                        <p class="text-sm text-gray-600">{{ $req->requester_shift_code }}</p>
+                    </div>
+                </div>
 
-    <!-- Modal Sukses Ambil -->
-    <div id="modalAmbil" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div class="bg-white p-8 rounded-xl shadow-2xl text-center max-w-sm">
-            <h3 class="text-2xl font-bold mb-3">Berhasil Mengambil Shift!</h3>
-            <p class="text-gray-600 mb-6">Silahkan cek di bagian menu</p>
-            <button onclick="location.reload()" class="bg-teal-500 text-white px-6 py-3 rounded-lg w-full">
-                OK
-            </button>
-        </div>
+                @if($req->message)
+                    <div class="bg-gray-50 rounded-xl p-4 mb-4">
+                        <p class="text-sm text-gray-700 italic">"{{ $req->message }}"</p>
+                    </div>
+                @endif
+
+                <!-- Aksi -->
+                @if($req->isPending())
+                    <div class="flex gap-3 justify-end">
+                        <form action="{{ route('shift-exchange.reject') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="id" value="{{ $req->id }}">
+                            <button type="submit" class="px-6 py-2 rounded-xl border border-red-300 text-red-700 bg-red-50 hover:bg-red-100">Reject</button>
+                        </form>
+                        <form action="{{ route('shift-exchange.accept') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="id" value="{{ $req->id }}">
+                            <button type="submit" class="px-6 py-2 rounded-xl bg-teal-500 text-white hover:bg-teal-600">Accept</button>
+                        </form>
+                    </div>
+                @elseif($req->isAccepted())
+                    <p class="text-center text-green-600 font-medium">Shift telah ditukar</p>
+                @endif
+            </div>
+        @empty
+            <p class="text-center text-gray-500 py-12">Belum ada permintaan masuk</p>
+        @endforelse
     </div>
+</div>
   
     <!-- FOOTER -->
     <footer class="w-full mt-10">
@@ -254,7 +280,7 @@
 
         const id = selected.value;
 
-        fetch("{{ route('shift-exchange.take') }}", {
+        fetch("{{ route('shift-exchange.accept') }}", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
