@@ -231,8 +231,11 @@ Route::middleware(['auth'])->group(function () {
         ->name('shift-exchange.reject');
 
     Route::get('/notifications', [ShiftExchangeController::class, 'notifications'])
-     ->name('notifications')
-     ->middleware('auth');
+        ->name('notifications')
+        ->middleware('auth');
+
+    Route::post('/notifications/read-all', [ShiftExchangeController::class, 'markAllRead'])
+        ->name('notifications.read.all');
     
         // 👉 JADWAL SHIFT – POV ASPRAK
     Route::get('/asprak/jadwal',            [AsprakShiftController::class, 'index'])

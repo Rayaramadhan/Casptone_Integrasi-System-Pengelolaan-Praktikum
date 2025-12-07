@@ -11,7 +11,43 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-      body { font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+
+    /* Style utama untuk TomSelect agar sama seperti input date */
+    .ts-control {
+        border-color: #d1d5db !important;  /* border-gray-300 */
+        min-height: 20px !important;       /* tinggi seragam */
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    /* Placeholder */
+    .ts-control input {
+        @apply text-gray-500;
+        font-size: 1rem !important;
+    }
+
+    /* Saat focus */
+    .ts-control.focus {
+        border-color: #3b82f6 !important;   /* border-blue-500 */
+        box-shadow: 0 0 0 1px #3b82f6 !important;
+    }
+
+    /* Dropdown box */
+    .ts-dropdown {
+        border-radius: 0.5rem !important;   /* rounded-lg */
+        border-color: #d1d5db !important;   /* border-gray-300 */
+    }
+
+    /* Hover */
+    .ts-dropdown .option:hover {
+        background: #f3f4f6 !important;     /* bg-gray-100 */
+    }
+
+    /* Active */
+    .ts-dropdown .active {
+        background: #e5e7eb !important;     /* bg-gray-200 */
+    }
   </style>
 </head>
 <body class="bg-[#f5f7fb] min-h-full flex flex-col">
@@ -189,7 +225,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <label class="block font-medium mb-2">Pilih Nama</label>
-                <select id="target_user_id" class="w-full border rounded-lg p-3">
+                <select id="target_user_id" class="w-full border rounded-lg p-2" required>
                     <option value="">-- Pilih Nama --</option>
                     @foreach($users as $user)
                         <option value="{{ $user->id }}">{{ $user->name }}</option>
@@ -199,12 +235,12 @@
 
             <div>
                 <label class="block font-medium mb-2">Tanggal</label>
-                <input type="date" id="target_date" class="w-full border rounded-lg p-3">
+                <input type="date" id="target_date" class="w-full border rounded-lg p-3" required>
             </div>
 
             <div>
                 <label class="block font-medium mb-2">Jam</label>
-                <select id="target_time" class="w-full border rounded-lg p-3">
+                <select id="target_time" class="w-full border rounded-lg p-3" required>
                     <option value="">-- Pilih Jam --</option>
                     <option value="06.30 - 09.30">06.30 – 09.30</option>
                     <option value="09.30 - 12.30">09.30 – 12.30</option>
@@ -215,7 +251,7 @@
 
             <div>
                 <label class="block font-medium mb-2">Kode Shift</label>
-                <input type="text" id="target_shift_code" placeholder="ex: SHIFT 4 (SI-46-09)" class="w-full border rounded-lg p-3">
+                <input type="text" id="target_shift_code" placeholder="ex: SHIFT 4 (SI-46-09)" class="w-full border rounded-lg p-3" required>
             </div>
         </div>
 
@@ -253,88 +289,97 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
+
     <script>
-    // 1. Highlight radio yang dipilih
-    document.querySelectorAll('input[name="my_shift"]').forEach(radio => {
-        radio.addEventListener('change', function () {
-            document.querySelectorAll('label[for]').forEach(label => {
-                label.classList.remove('border-blue-500', 'bg-blue-50');
+        // --- Searchable Select untuk pilih nama ---
+        new TomSelect('#target_user_id', {
+            create: false,
+            placeholder: 'Ketik nama asprak...',
+            sortField: {
+                field: 'text',
+                direction: 'asc'
+            }
+        });
+
+        // 1. Highlight radio yang dipilih
+        document.querySelectorAll('input[name="my_shift"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                document.querySelectorAll('label[for]').forEach(label => {
+                    label.classList.remove('border-blue-500', 'bg-blue-50');
+                });
+                if (this.id) {
+                    document.querySelector(`label[for="${this.id}"]`)?.classList.add('border-blue-500', 'bg-blue-50');
+                }
             });
-            if (this.id) {
-                document.querySelector(`label[for="${this.id}"]`)?.classList.add('border-blue-500', 'bg-blue-50');
-            }
         });
-    });
 
-    // 2. Kirim permintaan
-    document.getElementById('btnKirim').addEventListener('click', function (e) {
-        e.preventDefault(); // safety
+        // 2. Kirim permintaan
+        document.getElementById('btnKirim').addEventListener('click', function (e) {
+            e.preventDefault(); // safety
 
-        // Pastikan ada yang dipilih
-        const selectedMyShift = document.querySelector('input[name="my_shift"]:checked');
-        if (!selectedMyShift) {
-            alert('Pilih jadwal kamu dulu!');
-            return;
-        }
-
-        // Ambil data dari dataset (pastikan di HTML ada data-xxx)
-        const myDate = selectedMyShift.dataset.date;
-        const myTime = selectedMyShift.dataset.time;
-        const myCode = selectedMyShift.dataset.code;
-
-        if (!myDate || !myTime || !myCode) {
-            console.error('Radio button tidak punya data-date/time/code!', selectedMyShift);
-            alert('Error: data shift tidak lengkap. Hubungi admin.');
-            return;
-        }
-
-        const data = {
-            my_shift_date: myDate,
-            my_shift_time: myTime,
-            my_shift_code: myCode,
-            target_user_id: document.getElementById('target_user_id').value,
-            target_date: document.getElementById('target_date').value,
-            target_time: document.getElementById('target_time').value,
-            target_shift_code: document.getElementById('target_shift_code').value,
-            message: document.getElementById('message').value.trim(),
-        };
-
-        // Validasi field wajib
-        if (!data.target_user_id || !data.target_date || !data.target_time || !data.target_shift_code) {
-            alert('Lengkapi semua field Cari Jadwal Baru!');
-            return;
-        }
-
-        // Disable tombol + loading
-        this.disabled = true;
-        this.innerHTML = 'Mengirim...';
-
-        fetch("{{ route('request-shift.store') }}", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(res => {
-            if (res.success) {
-                document.getElementById('modalSukses').classList.remove('hidden');
-            } else {
-                alert(res.message || 'Gagal mengirim permintaan');
+            const selectedMyShift = document.querySelector('input[name="my_shift"]:checked');
+            if (!selectedMyShift) {
+                alert('Pilih jadwal kamu dulu!');
+                return;
             }
-        })
-        .catch(err => {
-            console.error(err);
-            alert('Terjadi kesalahan jaringan');
-        })
-        .finally(() => {
-            this.disabled = false;
-            this.innerHTML = 'Kirim Permintaan';
+
+            const myDate = selectedMyShift.dataset.date;
+            const myTime = selectedMyShift.dataset.time;
+            const myCode = selectedMyShift.dataset.code;
+
+            if (!myDate || !myTime || !myCode) {
+                console.error('Radio button tidak punya data lengkap!', selectedMyShift);
+                alert('Error: data shift tidak lengkap. Hubungi admin.');
+                return;
+            }
+
+            const data = {
+                my_shift_date: myDate,
+                my_shift_time: myTime,
+                my_shift_code: myCode,
+                target_user_id: document.getElementById('target_user_id').value,
+                target_date: document.getElementById('target_date').value,
+                target_time: document.getElementById('target_time').value,
+                target_shift_code: document.getElementById('target_shift_code').value,
+                message: document.getElementById('message').value.trim(),
+            };
+
+            if (!data.target_user_id || !data.target_date || !data.target_time || !data.target_shift_code) {
+                alert('Lengkapi semua field Cari Jadwal Baru!');
+                return;
+            }
+
+            this.disabled = true;
+            this.innerHTML = 'Mengirim...';
+
+            fetch("{{ route('request-shift.store') }}", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(res => {
+                if (res.success) {
+                    document.getElementById('modalSukses').classList.remove('hidden');
+                } else {
+                    alert(res.message || 'Gagal mengirim permintaan');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Terjadi kesalahan jaringan');
+            })
+            .finally(() => {
+                this.disabled = false;
+                this.innerHTML = 'Kirim Permintaan';
+            });
         });
-    });
-</script>
+    </script>
 </body>
 </html>

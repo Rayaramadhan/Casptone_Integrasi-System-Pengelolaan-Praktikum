@@ -23,7 +23,7 @@ class ShiftExchangeController extends Controller
     }
 
     public function create() {
-        $users = \App\Models\User::where('id', '!=', Auth::id())->get();
+        $users = \App\Models\User::where('usertype', 'asprak')->where('id', '!=', Auth::id())->orderBy('name')->get();
         $myShifts = []; // Bisa diisi dari jadwal user (misal dari tabel shift lain)
         // Untuk demo, kita hardcode dulu
         $myShifts = [
