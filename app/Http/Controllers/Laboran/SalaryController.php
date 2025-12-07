@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 class SalaryController extends Controller
 {
-    // LIST + FILTER (tampilan tabel seperti desain kamu)
+    // LIST + FILTER (tampilan tabel)
     public function index(Request $request)
     {
         $query = Salary::with('asprak');
@@ -31,8 +31,7 @@ class SalaryController extends Controller
     // FORM INPUT / CREATE
     public function create()
     {
-        // asprak = user dengan usertype = 'user' (lihat screenshot)
-        // kalau nanti kamu ubah ke 'asprak', ganti saja nilainya
+        // asprak = user dengan usertype = 'user'
         $aspraks = User::where('usertype', 'user')
             ->orderBy('name')
             ->get();
@@ -40,7 +39,7 @@ class SalaryController extends Controller
         return view('laboran.salary.create', compact('aspraks'));
     }
 
-    // SIMPAN DATA
+    /// SIMPAN DATA
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -51,17 +50,33 @@ class SalaryController extends Controller
             'jumlah_shift'   => ['required', 'integer', 'min:0'],
             'slip_gaji'      => ['required', 'integer', 'min:0'],
             'status'         => ['nullable', 'string', 'max:20'],
-            'bukti_foto'     => ['nullable', 'image', 'max:2048'], // max ~2MB
+            'bukti_foto'     => ['nullable', 'image', 'max:4096'],
         ]);
 
         $data['status']     = $data['status'] ?? 'success';
         $data['created_by'] = Auth::id();
         $data['updated_by'] = Auth::id();
 
-        // simpan file ke storage/app/public/salary_receipts
+        // ==========================
+        // SIMPAN FILE KE public/storage/salary_receipts
+        // ==========================
         if ($request->hasFile('bukti_foto')) {
-            $data['bukti_foto'] = $request->file('bukti_foto')
-                ->store('salary_receipts', 'public');
+
+            $folder = public_path('/storage/salary_receipts');
+
+            // jika folder belum ada → buat
+            if (!file_exists($folder)) {
+                mkdir($folder, 0755, true);
+            }
+
+            $file     = $request->file('bukti_foto');
+            $filename = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
+
+            // simpan file fisik
+            $file->move($folder, $filename);
+
+            // path yang disimpan ke database
+            $data['bukti_foto'] = 'storage/salary_receipts/' . $filename;
         }
 
         Salary::create($data);
@@ -70,4 +85,79 @@ class SalaryController extends Controller
             ->route('laboran.salary.index')
             ->with('success', 'Data gaji berhasil disimpan.');
     }
+
+    // =======================
+    // EDIT FORM
+    // =======================
+    public function edit($id)
+    {
+        $salary = Salary::findOrFail($id);
+
+        $aspraks = User::where('usertype', 'user')->orderBy('name')->get();
+
+        return view('laboran.salary.edit', compact('salary', 'aspraks'));
+    }
+
+    // =======================
+    // UPDATE DATA
+    // =======================
+    public function update(Request $request, $id)
+    {
+        $salary = Salary::findOrFail($id);
+
+        $data = $request->validate([
+            'asprak_id'      => ['nullable', 'exists:users,id'],
+            'nama_mahasiswa' => ['required', 'string', 'max:255'],
+            'nim'            => ['required', 'string', 'max:20'],
+            'kelas'          => ['nullable', 'string', 'max:30'],
+            'jumlah_shift'   => ['required', 'integer', 'min:0'],
+            'slip_gaji'      => ['required', 'integer', 'min:0'],
+            'status'         => ['nullable', 'string', 'max:20'],
+            'bukti_foto'     => ['nullable', 'image', 'max:4096'],
+        ]);
+
+        $data['updated_by'] = Auth::id();
+
+        // Upload FILE BARU jika ada
+        if ($request->hasFile('bukti_foto')) {
+
+            $folder = public_path('storage/salary_receipts');
+            if (!file_exists($folder)) mkdir($folder, 0755, true);
+
+            $file = $request->file('bukti_foto');
+            $filename = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
+            $file->move($folder, $filename);
+
+            // HAPUS FILE LAMA jika ada
+            if ($salary->bukti_foto && file_exists(public_path($salary->bukti_foto))) {
+                unlink(public_path($salary->bukti_foto));
+            }
+
+            $data['bukti_foto'] = 'storage/salary_receipts/' . $filename;
+        }
+
+        $salary->update($data);
+
+        return redirect()->route('laboran.salary.index')
+            ->with('success', 'Data salary berhasil diperbarui.');
+    }
+
+    // =======================
+    // DELETE
+    // =======================
+    public function destroy($id)
+    {
+        $salary = Salary::findOrFail($id);
+
+        // hapus file
+        if ($salary->bukti_foto && file_exists(public_path($salary->bukti_foto))) {
+            unlink(public_path($salary->bukti_foto));
+        }
+
+        $salary->delete();
+
+        return redirect()->route('laboran.salary.index')
+            ->with('success', 'Data salary berhasil dihapus.');
+    }
+
 }

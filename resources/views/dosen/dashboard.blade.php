@@ -212,7 +212,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-7 justify-items-center">
 
               <!-- Jadwal Mengajar -->
-              <a href="#"
+              <a href="{{ route('dosen.jadwal.index') }}"
                  class="w-full max-w-[260px] bg-gradient-to-b from-slate-50 to-white border border-teal-50 rounded-2xl shadow-sm
                         flex flex-col items-center py-5 px-4 hover:-translate-y-1 hover:shadow-md
                         hover:border-teal-300 transition duration-150 group">
@@ -228,7 +228,7 @@
               </a>
 
               <!-- Rekap Nilai Praktikum -->
-              <a href="#"
+              <a href="{{ route('nilai.index') }}"
                  class="w-full max-w-[260px] bg-gradient-to-b from-slate-50 to-white border border-teal-50 rounded-2xl shadow-sm
                         flex flex-col items-center py-5 px-4 hover:-translate-y-1 hover:shadow-md
                         hover:border-teal-300 transition duration-150 group">

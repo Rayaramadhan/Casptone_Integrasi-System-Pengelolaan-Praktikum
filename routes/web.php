@@ -11,7 +11,15 @@ use App\Http\Controllers\Asprak\PresensiController;
 use App\Http\Controllers\Asprak\ShiftExchangeController;
 use App\Http\Controllers\Praktikan\PraktikanController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\Laboran\ShiftSlotController;
+use App\Http\Controllers\Asprak\AsprakShiftController;
+use App\Http\Controllers\Dosen\DosenShiftController;
 use App\Http\Controllers\BacklogController;
+use App\Http\Controllers\Praktikan\PraktikanShiftController;
+use App\Http\Controllers\Dosen\DosenNilaiController;
+use App\Http\Controllers\Praktikan\PraktikanNilaiController;
+use App\Http\Controllers\Laboran\LaboranNilaiController;
+
 
 // 👉 TAMBAHAN: controller salary
 use App\Http\Controllers\Laboran\SalaryController as LaboranSalaryController;
@@ -82,10 +90,17 @@ Route::middleware(['auth', 'laboranMiddleware'])->group(function () {
     Route::get('/laboran/dashboard', [LaboranController::class, 'index'])
         ->name('laboran.dashboard');
 
+    Route::get('/laboran/nilai', [LaboranNilaiController::class, 'index'])->name('laboran.nilai.index');
+
     // 👉 SALARY – POV LABORAN
     Route::get('/laboran/salary',        [LaboranSalaryController::class, 'index'])->name('laboran.salary.index');
     Route::get('/laboran/salary/create', [LaboranSalaryController::class, 'create'])->name('laboran.salary.create');
     Route::post('/laboran/salary',       [LaboranSalaryController::class, 'store'])->name('laboran.salary.store');
+    Route::get('/laboran/salary/{salary}/edit', [LaboranSalaryController::class, 'edit'])->name('laboran.salary.edit');
+    Route::put('/laboran/salary/{salary}',       [LaboranSalaryController::class, 'update'])->name('laboran.salary.update');
+    Route::delete('/laboran/salary/{salary}',    [LaboranSalaryController::class, 'destroy'])->name('laboran.salary.destroy');
+
+    
 
     // 👉 REPORT REVIEW – POV LABORAN (Review & Approve Reports)
     Route::get('/laboran/reports', [ReportReviewController::class, 'index'])
@@ -137,6 +152,17 @@ Route::middleware(['auth', 'laboranMiddleware'])->group(function () {
         ->name('laboran.submissions.reject');
     Route::get('/assignments/{assignment}/submissions', [LaboranSubmissionController::class, 'byAssignment'])
         ->name('laboran.submissions.by-assignment');
+    
+    
+     // ✅ JADWAL SHIFT – LABORAN
+    Route::get('/laboran/jadwal',              [ShiftSlotController::class, 'index'])->name('laboran.jadwal.index');
+    Route::get('/laboran/jadwal/create',       [ShiftSlotController::class, 'create'])->name('laboran.jadwal.create');
+    Route::post('/laboran/jadwal',             [ShiftSlotController::class, 'store'])->name('laboran.jadwal.store');
+
+    // 👉 Tambahan: edit & delete
+    Route::get('/laboran/jadwal/{slot}/edit',  [ShiftSlotController::class, 'edit'])->name('laboran.jadwal.edit');
+    Route::put('/laboran/jadwal/{slot}',       [ShiftSlotController::class, 'update'])->name('laboran.jadwal.update');
+    Route::delete('/laboran/jadwal/{slot}',    [ShiftSlotController::class, 'destroy'])->name('laboran.jadwal.destroy');
 });
 
 // ===============================
@@ -145,6 +171,13 @@ Route::middleware(['auth', 'laboranMiddleware'])->group(function () {
 Route::middleware(['auth', 'dosenMiddleware'])->group(function () {
     Route::get('/dosen/dashboard', [DosenController::class, 'index'])
         ->name('dosen.dashboard');
+
+    // JADWAL SHIFT – POV DOSEN (lihat semua jadwal dari Laboran)
+    Route::get('/dosen/jadwal', [DosenShiftController::class, 'index'])
+        ->name('dosen.jadwal.index');
+    
+    Route::get('/nilai', [DosenNilaiController::class, 'index'])
+    ->name('nilai.index');
 });
 
 // ===============================
@@ -153,6 +186,13 @@ Route::middleware(['auth', 'dosenMiddleware'])->group(function () {
 Route::middleware(['auth', 'praktikanMiddleware'])->group(function () {
     Route::get('/praktikan/dashboard', [PraktikanController::class, 'index'])
         ->name('praktikan.dashboard');
+
+    Route::get('/praktikan/jadwal', [PraktikanShiftController::class, 'index'])
+    ->name('praktikan.jadwal.index');
+
+        
+    Route::get('/praktikan/nilai', [PraktikanNilaiController::class, 'index'])
+        ->name('praktikan.nilai.index');
 });
 
 // ===============================
@@ -169,6 +209,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('asprak.nilai.index');
     Route::post('/asprak/nilai', [NilaiController::class, 'store'])
         ->name('asprak.nilai.store');
+    Route::get('/asprak/nilai/{id}/edit', [NilaiController::class, 'edit'])->name('asprak.nilai.edit');
+    Route::put('/asprak/nilai/{id}', [NilaiController::class, 'update'])->name('asprak.nilai.update');
+    Route::delete('/asprak/nilai/{id}', [NilaiController::class, 'destroy'])->name('asprak.nilai.destroy');
+
 
     // PRESENSI
     Route::get('/presensi', [PresensiController::class, 'index'])->name('presensi');
@@ -189,7 +233,19 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', [ShiftExchangeController::class, 'notifications'])
      ->name('notifications')
      ->middleware('auth');
+    
+        // 👉 JADWAL SHIFT – POV ASPRAK
+    Route::get('/asprak/jadwal',            [AsprakShiftController::class, 'index'])
+        ->name('asprak.jadwal.index');
+    Route::get('/asprak/jadwal/available',  [AsprakShiftController::class, 'available'])
+        ->name('asprak.jadwal.available');
+    Route::post('/asprak/jadwal/available', [AsprakShiftController::class, 'storeSelection'])
+        ->name('asprak.jadwal.store');
 
+    Route::get('/asprak/nilai/{id}/edit', [NilaiController::class, 'edit'])->name('asprak.nilai.edit');
+    Route::put('/asprak/nilai/{id}', [NilaiController::class, 'update'])->name('asprak.nilai.update');
+    Route::delete('/asprak/nilai/{id}', [NilaiController::class, 'destroy'])->name('asprak.nilai.destroy');
+    
 
     // 👉 SALARY – POV ASPRAK (lihat gaji sendiri)
     Route::get('/asprak/salary', [AsprakSalaryController::class, 'index'])
@@ -266,4 +322,13 @@ Route::middleware(['auth'])->group(function () {
         ->name('asprak.submissions.update');
     Route::delete('/asprak/submissions/{submission}', [AsprakSubmissionController::class, 'destroy'])
         ->name('asprak.submissions.destroy');
+
+    Route::get('/asprak/jadwal',          [AsprakShiftController::class, 'index'])
+        ->name('asprak.jadwal.index');
+    Route::get('/asprak/jadwal/{id}/ambil',  [AsprakShiftController::class, 'ambil'])
+        ->name('asprak.jadwal.ambil');
+    Route::post('/asprak/jadwal/{id}/ambil', [AsprakShiftController::class, 'ambilStore'])
+        ->name('asprak.jadwal.ambil.store');
+    Route::delete('/asprak/jadwal/{id}/batal', [AsprakShiftController::class, 'batal'])
+        ->name('asprak.jadwal.batal');
 });

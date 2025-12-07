@@ -2,202 +2,126 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Transparasi Gaji Saya - Asprak</title>
+    <title>Gaji Asisten Praktikum</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- FONT POPPINS -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style> body { font-family: 'Poppins', sans-serif; } </style>
+    <style>
+        body { font-family: "Poppins", sans-serif; }
+    </style>
 </head>
 
 <body class="bg-[#f5f7fb] min-h-screen">
-
-<!-- TOP BAR -->
-  <header class="w-full bg-white border-b border-teal-50 shadow-[0_2px_6px_rgba(15,118,110,0.08)]">
-    <!-- di sini: w-full, tanpa max-w & mx-auto, px-0 supaya mentok kiri-kanan -->
+<!-- HEADER -->
+<header class="w-full bg-white border-b border-teal-50 shadow-[0_2px_6px_rgba(15,118,110,0.08)]">
     <div class="w-full px-0 py-3 flex items-center justify-between gap-4">
 
-      <!-- blok kiri hijau (logo + title) -->
-      <div class="flex items-stretch">
-        <div class="flex items-center bg-teal-500 text-white px-5 sm:px-7 py-3 sm:py-4 rounded-br-3xl rounded-tr-3xl shadow-sm">
-          <div class="flex items-center gap-3">
-            <div class="h-10 w-10 sm:h-11 sm:w-11 bg-white/20 rounded-full flex items-center justify-center shadow-inner">
-              <img
-                src="/images/utama/logo.png"
-                alt="Logo SIAP"
-                class="h-8 w-8 sm:h-9 sm:w-9 object-contain rounded-full"
-              />
+        <!-- Logo kiri -->
+        <div class="flex items-stretch">
+            <div class="flex items-center bg-teal-500 text-white px-5 sm:px-7 py-3 sm:py-4 rounded-br-3xl rounded-tr-3xl shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="h-10 w-10 sm:h-11 sm:w-11 bg-white/20 rounded-full flex items-center justify-center shadow-inner">
+                        <img src="/images/utama/logo.png" class="h-8 w-8 sm:h-9 sm:w-9 object-contain rounded-full"/>
+                    </div>
+                    <div class="leading-tight">
+                        <p class="text-[10px] sm:text-[11px] uppercase tracking-[0.16em] text-teal-50/90">Sistem Informasi</p>
+                        <span class="font-semibold text-sm sm:text-lg tracking-wide">SIAP</span>
+                    </div>
+                </div>
             </div>
-            <div class="leading-tight">
-              <p class="text-[10px] sm:text-[11px] uppercase tracking-[0.16em] text-teal-50/90">
-                Sistem Informasi
-              </p>
-              <span class="font-semibold text-sm sm:text-lg tracking-wide">
-                SIAP
-              </span>
-            </div>
-          </div>
         </div>
-      </div>
 
-      <!-- kanan: info user + tombol -->
-      <div class="flex items-center justify-end flex-1 pr-0">
-        @auth
+        <!-- Kanan: user -->
+        <div class="flex items-center justify-end flex-1 pr-0">
+            @auth
             @php
                 $initial = strtoupper(mb_substr(Auth::user()->name, 0, 1));
-                $isAdmin = Auth::user()->usertype === 'admin';
-                $dashUrl = $isAdmin ? url('/admin/dashboard') : url('/dashboard');
+                $dashUrl = url('/dashboard');
             @endphp
 
-            {{-- DESKTOP / TABLET: kapsul lengkap --}}
-            <div
-                class="hidden md:flex items-center gap-4 rounded-full bg-white/80 border border-slate-200
-                       px-5 py-2.5 shadow-[0_6px_18px_rgba(15,23,42,0.08)] backdrop-blur-sm
-                       max-w-md mr-4">
+            <!-- Desktop -->
+            <div class="hidden md:flex items-center gap-4 rounded-full bg-white/80 border border-slate-200
+                        px-5 py-2.5 shadow-[0_6px_18px_rgba(15,23,42,0.08)] backdrop-blur-sm max-w-md mr-4">
 
-                {{-- Nama + email --}}
                 <div class="flex flex-col leading-tight">
-                    <span class="font-semibold text-sm text-slate-900">
-                        {{ Auth::user()->name }}
-                    </span>
-                    <span class="text-xs text-slate-500">
-                        {{ Auth::user()->email }}
-                    </span>
+                    <span class="font-semibold text-sm text-slate-900">{{ Auth::user()->name }}</span>
+                    <span class="text-xs text-slate-500">{{ Auth::user()->email }}</span>
                 </div>
 
-                {{-- Tombol Dashboard --}}
-                <a href="{{ $dashUrl }}"
-                   class="inline-flex items-center justify-center text-xs md:text-sm font-medium
-                          px-4 py-1.5 rounded-full border border-teal-400
-                          text-teal-600 bg-teal-50
-                          hover:bg-teal-500 hover:text-white hover:border-teal-500
-                          transition-colors duration-150">
+                <a href="{{ $dashUrl }}" class="text-xs md:text-sm font-medium px-4 py-1.5 rounded-full
+                        border border-teal-400 text-teal-600 bg-teal-50 hover:bg-teal-500 hover:text-white transition">
                     Dashboard
-                </a>
-
-                {{-- Tombol Logout --}}
-                <form method="POST" action="{{ route('logout') }}" class="block">
-                    @csrf
-                    <button type="submit"
-                            class="inline-flex items-center justify-center text-xs md:text-sm font-medium
-                                   px-4 py-1.5 rounded-full border border-slate-200
-                                   text-slate-600 bg-white
-                                   hover:bg-slate-50 hover:border-slate-300
-                                   transition-colors duration-150">
-                        Logout
-                    </button>
-                </form>
-
-                {{-- Avatar inisial --}}
-                <div class="relative">
-                    <div
-                        class="flex items-center justify-center h-9 w-9 rounded-full
-                               bg-teal-500 text-white text-xs md:text-sm font-semibold shadow-sm">
-                        {{ $initial }}
-                    </div>
-                    {{-- indikator online kecil --}}
-                    <span
-                        class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400
-                               border-2 border-white">
-                    </span>
-                </div>
-            </div>
-
-            {{-- MOBILE: versi ringkas --}}
-            <div class="flex md:hidden items-center gap-2 mr-2">
-                <div class="text-right leading-tight mr-1">
-                    <p class="text-[11px] font-medium text-slate-900">
-                        {{ \Illuminate\Support\Str::limit(Auth::user()->name, 14) }}
-                    </p>
-                    <p class="text-[10px] text-slate-500">
-                        {{ \Illuminate\Support\Str::limit(Auth::user()->email, 18) }}
-                    </p>
-                </div>
-
-                <a href="{{ $dashUrl }}"
-                   class="text-[11px] font-medium px-3 py-1 rounded-full border border-teal-400
-                          text-teal-600 bg-white hover:bg-teal-50 transition">
-                    Dash
                 </a>
 
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit"
-                            class="text-[11px] px-3 py-1 rounded-full border border-slate-300
+                    <button class="text-xs md:text-sm font-medium px-4 py-1.5 rounded-full border border-slate-200
                                    text-slate-600 bg-white hover:bg-slate-50 transition">
-                        Out
+                        Logout
                     </button>
                 </form>
 
-                <div
-                    class="flex items-center justify-center h-8 w-8 rounded-full bg-teal-500 text-white
-                           text-[11px] font-semibold shadow-sm">
-                    {{ $initial }}
+                <div class="relative">
+                    <div class="flex items-center justify-center h-9 w-9 rounded-full bg-teal-500 text-white font-semibold shadow-sm">
+                        {{ $initial }}
+                    </div>
+                    <span class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400 border-2 border-white"></span>
                 </div>
             </div>
-        @else
-            <!-- Kalau belum login: seperti header welcome (Login + Daftar) -->
-            <div class="flex items-center gap-3 sm:gap-4 pr-4">
-                <a href="{{ route('login') }}"
-                   class="text-xs sm:text-sm font-medium text-slate-800 px-3 sm:px-4 py-1.5 rounded-full
-                          border border-slate-200 bg-white hover:bg-slate-50 transition">
-                    Login
-                </a>
+            @endauth
+        </div>
 
-                @if (Route::has('register'))
-                    <a href="{{ route('register') }}"
-                       class="text-xs sm:text-sm font-medium text-white px-4 sm:px-5 py-1.5 rounded-full
-                              bg-teal-500 shadow-[0_4px_10px_rgba(20,184,166,0.35)]
-                              hover:bg-teal-600 transition">
-                        Daftar Asisten
-                    </a>
-                @endif
-            </div>
-        @endauth
-      </div>
     </div>
-  </header>
-<div class="max-w-5xl mx-auto py-10 px-4">
+</header>
 
-    <!-- Header Title -->
+<div class="max-w-6xl mx-auto py-10 px-4">
+
+<!-- Tombol Kembali -->
+    <a href="{{ url()->previous() }}" 
+       class="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full text-[13px] font-medium
+              border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-300
+              shadow-sm transition">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+             viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        Kembali
+    </a>
+
     <div class="mb-6">
         <h1 class="text-3xl font-bold text-slate-900 tracking-tight">
             Gaji Asisten Praktikum
         </h1>
-        <p class="text-sm text-slate-500 mt-1">
-            Hai, <span class="font-semibold text-teal-700">{{ $asprak->name }}</span>.  
+        <p class="text-sm text-slate-600 mt-1">
+            Hai, <span class="font-semibold text-teal-700">{{ $asprak->name }}</span>.
             Berikut adalah riwayat gaji Anda.
         </p>
     </div>
 
-    <!-- Card Wrapper -->
-    <div class="rounded-[24px] bg-gradient-to-br from-[#e6faf9] via-white to-[#e8f1ff] p-[1px]
-                shadow-[0_15px_35px_rgba(0,0,0,0.06)]">
+    <!-- CARD WRAPPER -->
+    <div class="rounded-[24px] bg-gradient-to-br from-[#e8fffd] via-white to-[#e7f0ff] p-[1px] shadow-xl">
         
         <div class="bg-white rounded-[22px] overflow-hidden">
 
-            <!-- Table -->
             <div class="overflow-x-auto">
                 <table class="min-w-full text-xs md:text-sm border-separate border-spacing-0">
 
-                    <!-- Table Head -->
                     <thead>
-                        <tr class="bg-teal-50/80 text-slate-700 uppercase text-[11px] tracking-wide">
-                            <th class="py-3 px-3 text-left font-semibold border-b border-teal-100">No</th>
-                            <th class="py-3 px-3 text-left font-semibold border-b border-teal-100">Nama</th>
-                            <th class="py-3 px-3 text-left font-semibold border-b border-teal-100">NIM</th>
-                            <th class="py-3 px-3 text-left font-semibold border-b border-teal-100">Kelas</th>
-                            <th class="py-3 px-3 text-center font-semibold border-b border-teal-100">Shift</th>
-                            <th class="py-3 px-3 text-right font-semibold border-b border-teal-100">Slip Gaji</th>
-                            <th class="py-3 px-3 text-center font-semibold border-b border-teal-100">Bukti</th>
-                            <th class="py-3 px-3 text-center font-semibold border-b border-teal-100">Status</th>
+                        <tr class="bg-teal-50 text-slate-700 uppercase text-[11px] tracking-wide">
+                            <th class="py-3 px-3 text-left border-b border-teal-100">No</th>
+                            <th class="py-3 px-3 text-left border-b border-teal-100">Nama</th>
+                            <th class="py-3 px-3 text-left border-b border-teal-100">NIM</th>
+                            <th class="py-3 px-3 text-left border-b border-teal-100">Kelas</th>
+                            <th class="py-3 px-3 text-center border-b border-teal-100">Shift</th>
+                            <th class="py-3 px-3 text-right border-b border-teal-100">Slip Gaji</th>
+                            <th class="py-3 px-3 text-center border-b border-teal-100">Bukti</th>
+                            <th class="py-3 px-3 text-center border-b border-teal-100">Status</th>
                         </tr>
                     </thead>
 
-                    <!-- Table Body -->
                     <tbody>
                         @forelse($salaries as $index => $salary)
-                        <tr class="group border-t border-slate-100 hover:bg-teal-50/40 transition duration-150">
+                        <tr class="group border-t border-slate-100 hover:bg-teal-50/40 transition">
 
                             <td class="py-3 px-3">
                                 {{ $salaries->firstItem() + $index }}
@@ -207,11 +131,15 @@
                                 {{ $salary->nama_mahasiswa }}
                             </td>
 
-                            <td class="py-3 px-3 text-slate-700">{{ $salary->nim }}</td>
+                            <td class="py-3 px-3 text-slate-700">
+                                {{ $salary->nim }}
+                            </td>
 
-                            <td class="py-3 px-3 text-slate-700">{{ $salary->kelas ?? '-' }}</td>
+                            <td class="py-3 px-3 text-slate-700">
+                                {{ $salary->kelas ?? '-' }}
+                            </td>
 
-                            <td class="py-3 px-3 text-center font-semibold text-slate-800">
+                            <td class="py-3 px-3 text-center font-semibold text-slate-900">
                                 {{ $salary->jumlah_shift }}
                             </td>
 
@@ -219,64 +147,71 @@
                                 Rp{{ number_format($salary->slip_gaji, 0, ',', '.') }}
                             </td>
 
-                            <!-- Bukti Foto -->
+                            <!-- BUKTI -->
                             <td class="py-3 px-3 text-center">
+
                                 @if($salary->bukti_foto)
-                                <a href="{{ asset('storage/'.$salary->bukti_foto) }}" target="_blank"
-                                   class="inline-block transform group-hover:scale-110 transition">
-                                    <img src="{{ asset('storage/'.$salary->bukti_foto) }}"
-                                         class="h-10 w-10 rounded-md object-cover border border-slate-200 shadow-sm">
-                                </a>
+
+                                    @php
+                                        // Path sudah disimpan sebagai: storage/salary_receipts/xxx.jpg
+                                        $imageUrl = asset($salary->bukti_foto);
+                                    @endphp
+
+                                    <a href="{{ $imageUrl }}" target="_blank" class="inline-block transform hover:scale-110 transition">
+                                        <img src="{{ $imageUrl }}"
+                                             class="h-10 w-10 rounded-md object-cover border border-slate-200 shadow-sm">
+                                    </a>
+
                                 @else
-                                <span class="text-[11px] text-slate-400">Tidak Ada</span>
+                                    <span class="text-[11px] text-slate-400">Tidak Ada</span>
                                 @endif
+
                             </td>
 
-                            <!-- Status -->
+                            <!-- STATUS -->
                             <td class="py-3 px-3 text-center">
+
                                 @if($salary->status === 'success')
-                                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full
-                                        bg-emerald-50 text-emerald-700 border border-emerald-200
-                                        text-[11px] font-semibold shadow-sm">
-                                    <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-                                    Selesai
-                                </span>
+                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-semibold">
+                                        <span class="h-2 w-2 bg-emerald-500 rounded-full"></span>
+                                        Selesai
+                                    </span>
                                 @else
-                                <span class="inline-flex px-3 py-1 rounded-full
-                                        bg-amber-50 text-amber-700 border border-amber-200
-                                        text-[11px] font-semibold shadow-sm">
-                                    Pending
-                                </span>
+                                    <span class="inline-flex px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-[11px] font-semibold">
+                                        Pending
+                                    </span>
                                 @endif
+
                             </td>
+
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="py-6 text-center text-slate-500 text-sm italic">
+                            <td colspan="8" class="py-6 text-center text-slate-500 italic">
                                 Belum ada data gaji untuk akun Anda.
                             </td>
                         </tr>
                         @endforelse
                     </tbody>
+
                 </table>
             </div>
+
         </div>
     </div>
 
-    <!-- Pagination -->
-    <div class="mt-5 flex justify-center">
+    <!-- PAGINATION -->
+    <div class="mt-6 flex justify-center">
         {{ $salaries->links() }}
     </div>
 
 </div>
 
-  <!-- FOOTER -->
-  <footer class="mt-4 bg-teal-600 border-t border-teal-700 shadow-inner">
-    <div class="max-w-6xl mx-auto px-4 py-4 text-center">
-      <p class="text-white text-[11px] md:text-sm tracking-wide">
-        Created By <span class="font-semibold">Tim The Third-Party Gang</span>
-      </p>
-    </div>
-  </footer>
+<!-- FOOTER -->
+<footer class="bg-teal-500 text-white text-center py-4 mt-4">
+    <p class="text-sm">Created by Tim The Third-Party Gang</p>
+</footer>
+
+
 </body>
 </html>

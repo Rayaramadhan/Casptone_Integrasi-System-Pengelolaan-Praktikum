@@ -156,8 +156,10 @@
                             <th class="py-3 px-3 text-right">Slip Gaji</th>
                             <th class="py-3 px-3 text-center">Bukti</th>
                             <th class="py-3 px-3 text-center">Status</th>
+                            <th class="py-3 px-3 text-center">Aksi</th>
                         </tr>
                         </thead>
+
                         <tbody>
                         @forelse($salaries as $index => $salary)
                             <tr class="border-t border-slate-100 hover:bg-slate-50/70 transition">
@@ -167,16 +169,18 @@
                                 <td class="py-2.5 px-3">{{ $salary->kelas ?? '-' }}</td>
                                 <td class="py-2.5 px-3 text-center">{{ $salary->jumlah_shift }}</td>
                                 <td class="py-2.5 px-3 text-right">Rp{{ number_format($salary->slip_gaji, 0, ',', '.') }}</td>
+
                                 <td class="py-2.5 px-3 text-center">
                                     @if($salary->bukti_foto)
-                                        <a href="{{ asset('storage/'.$salary->bukti_foto) }}" target="_blank">
-                                            <img src="{{ asset('storage/'.$salary->bukti_foto) }}"
+                                        <a href="{{ asset($salary->bukti_foto) }}" target="_blank">
+                                            <img src="{{ asset($salary->bukti_foto) }}"
                                                  class="h-9 w-9 rounded-lg border object-cover shadow-sm hover:scale-110 transition">
                                         </a>
                                     @else
                                         <span class="text-[11px] text-slate-400">-</span>
                                     @endif
                                 </td>
+
                                 <td class="py-2.5 px-3 text-center">
                                     @if($salary->status === 'success')
                                         <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 text-[11px]">
@@ -189,13 +193,38 @@
                                         </span>
                                     @endif
                                 </td>
+
+                                <!-- ================== ACTION BUTTONS ================== -->
+                                <td class="py-2.5 px-3 text-center flex items-center gap-2 justify-center">
+
+                                    <!-- EDIT BUTTON -->
+                                    <a href="{{ route('laboran.salary.edit', $salary->id) }}"
+                                       class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-400 text-white hover:bg-amber-500 transition">
+                                        Edit
+                                    </a>
+
+                                    <!-- DELETE BUTTON -->
+                                    <form action="{{ route('laboran.salary.destroy', $salary->id) }}"
+                                          method="POST"
+                                          onsubmit="return confirm('Hapus data salary ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                                class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-500 text-white hover:bg-red-600 transition">
+                                            Hapus
+                                        </button>
+                                    </form>
+
+                                </td>
                             </tr>
+
                         @empty
                             <tr>
-                                <td colspan="8" class="py-5 text-center text-slate-400">Belum ada data salary.</td>
+                                <td colspan="9" class="py-5 text-center text-slate-400">Belum ada data salary.</td>
                             </tr>
                         @endforelse
                         </tbody>
+
                     </table>
                 </div>
             </div>
@@ -203,6 +232,7 @@
             <div class="mt-5">
                 {{ $salaries->withQueryString()->links() }}
             </div>
+
         </div>
     </section>
 </main>

@@ -262,7 +262,7 @@
               </a>
 
               <!-- Nilai -->
-              <a href="#"
+              <a href="{{ route('laboran.nilai.index') }}"
                 class="w-full max-w-[260px] bg-gradient-to-b from-slate-50 to-white border border-teal-50 rounded-2xl shadow-sm
                         flex flex-col items-center py-5 px-4 hover:-translate-y-1 hover:shadow-md
                         hover:border-teal-300 transition duration-150 group">
@@ -292,6 +292,24 @@
                   Pantau honor laboran, riwayat pencairan, dan status verifikasi pembayaran.
                 </p>
               </a>
+
+
+               <!-- Jadwal Mengajar -->
+              <a href="{{ route('laboran.jadwal.index') }}"
+                 class="w-full max-w-[260px] bg-gradient-to-b from-slate-50 to-white border border-teal-50 rounded-2xl shadow-sm
+                        flex flex-col items-center py-5 px-4 hover:-translate-y-1 hover:shadow-md
+                        hover:border-teal-300 transition duration-150 group">
+                <div class="w-11 h-11 mb-2 flex items-center justify-center rounded-2xl
+                            bg-gradient-to-br from-teal-50 to-emerald-50
+                            border border-teal-100 text-xl group-hover:scale-110 group-hover:bg-teal-100/70 transition">
+                  📅
+                </div>
+                <p class="text-sm md:text-base font-semibold text-slate-800">Input Shift Praktikum</p>
+                <p class="mt-1.5 text-[11px] text-slate-400 text-center">
+                  Lihat jadwal praktikum lengkap dengan kelas dan ruangan.
+                </p>
+              </a>
+
 
             </div>
           </div>
