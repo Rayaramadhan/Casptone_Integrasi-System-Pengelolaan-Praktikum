@@ -1,0 +1,22 @@
+<?php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('asprak_shift_registrations', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('shift_slot_id')->constrained('shift_slots')->cascadeOnDelete();
+            $table->foreignId('asprak_id')->constrained('users')->cascadeOnDelete();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('asprak_shift_registrations');
+    }
+};
