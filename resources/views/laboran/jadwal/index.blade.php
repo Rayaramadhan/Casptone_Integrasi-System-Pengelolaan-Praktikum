@@ -10,11 +10,9 @@
 
 <body class="bg-[#f5f7fb] min-h-screen flex flex-col">
 
-  <!-- TOP BAR (HEADER – tidak diubah) -->
   <header class="w-full bg-white border-b border-teal-50 shadow-[0_2px_6px_rgba(15,118,110,0.08)]">
     <div class="w-full px-0 py-3 flex items-center justify-between gap-4">
 
-      <!-- blok kiri hijau (logo + title) -->
       <div class="flex items-stretch">
         <div class="flex items-center bg-teal-500 text-white px-5 sm:px-7 py-3 sm:py-4 rounded-br-3xl rounded-tr-3xl shadow-sm">
           <div class="flex items-center gap-3">
@@ -37,7 +35,6 @@
         </div>
       </div>
 
-      <!-- kanan: info user + tombol -->
       <div class="flex items-center justify-end flex-1 pr-0">
         @auth
             @php
@@ -92,7 +89,6 @@
                                bg-teal-500 text-white text-xs md:text-sm font-semibold shadow-sm">
                         {{ $initial }}
                     </div>
-                    {{-- indikator online kecil --}}
                     <span
                         class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400
                                border-2 border-white">
@@ -133,11 +129,10 @@
                 </div>
             </div>
         @else
-            <!-- Kalau belum login: seperti header welcome (Login + Daftar) -->
             <div class="flex items-center gap-3 sm:gap-4 pr-4">
                 <a href="{{ route('login') }}"
                    class="text-xs sm:text-sm font-medium text-slate-800 px-3 sm:px-4 py-1.5 rounded-full
-                          border border-slate-200 bg-white hover:bg-slate-50 transition">
+                         border border-slate-200 bg-white hover:bg-slate-50 transition">
                     Login
                 </a>
 
@@ -154,25 +149,20 @@
       </div>
     </div>
   </header>
-  <!-- END HEADER -->
-
-  <!-- MAIN CONTENT -->
   <main class="flex-1">
     <div class="max-w-6xl mx-auto py-10 px-4">
 
-        <!-- Tombol Kembali -->
         <a href="{{ url()->previous() }}"
            class="inline-flex items-center gap-2 px-4 py-2 mb-4 rounded-full bg-white border border-slate-200 
                   text-slate-600 text-sm font-medium shadow-sm hover:bg-slate-50 hover:border-slate-300 
                   transition">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
             Kembali
         </a>
 
-        <!-- TITLE & BUTTON BUAT JADWAL -->
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h1 class="text-3xl font-bold text-slate-900 tracking-tight">
@@ -193,10 +183,10 @@
         {{-- Search --}}
         <form method="GET" action="{{ route('laboran.jadwal.index') }}" class="flex gap-2 mb-4">
             <input type="text" name="search" value="{{ $search }}"
-                   placeholder="Cari praktikum / shift / kelas..."
-                   class="flex-1 rounded-full border border-slate-200 px-4 py-2 text-sm focus:ring-2 focus:ring-teal-500">
+                   placeholder="Cari lab / praktikum / shift / kelas..."
+                   class="flex-1 rounded-full border border-slate-200 px-4 py-2 text-sm focus:ring-2 focus:ring-teal-500 outline-none">
             <button type="submit"
-                    class="px-4 py-2 rounded-full bg-teal-500 text-white text-sm font-medium hover:bg-teal-600">
+                    class="px-4 py-2 rounded-full bg-teal-500 text-white text-sm font-medium hover:bg-teal-600 transition">
                 Cari
             </button>
         </form>
@@ -213,6 +203,7 @@
             <table class="w-full text-sm">
                 <thead class="bg-slate-50 text-slate-600">
                 <tr>
+                    <th class="px-6 py-3 text-left">Lab</th> {{-- Kolom Baru --}}
                     <th class="px-6 py-3 text-left">Praktikum</th>
                     <th class="px-6 py-3 text-left">Shift</th>
                     <th class="px-6 py-3 text-left">Kelas</th>
@@ -224,7 +215,8 @@
                 </thead>
                 <tbody>
                 @forelse($slots as $slot)
-                    <tr class="border-t border-slate-100 hover:bg-slate-50/60">
+                    <tr class="border-t border-slate-100 hover:bg-slate-50/60 transition">
+                        <td class="px-6 py-3 font-medium text-teal-600">{{ $slot->lab }}</td> {{-- Isi Kolom Lab --}}
                         <td class="px-6 py-3">{{ $slot->praktikum }}</td>
                         <td class="px-6 py-3">{{ $slot->name }}</td>
                         <td class="px-6 py-3">{{ $slot->class_code }}</td>
@@ -242,7 +234,7 @@
                                 {{-- Edit --}}
                                 <a href="{{ route('laboran.jadwal.edit', $slot) }}"
                                    class="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 text-xs font-medium
-                                          hover:bg-blue-100">
+                                          hover:bg-blue-100 transition">
                                     Edit
                                 </a>
 
@@ -254,7 +246,7 @@
                                     @method('DELETE')
                                     <button type="submit"
                                             class="px-3 py-1.5 rounded-lg bg-red-50 text-red-600 text-xs font-medium
-                                                   hover:bg-red-100">
+                                                   hover:bg-red-100 transition">
                                         Delete
                                     </button>
                                 </form>
@@ -263,7 +255,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-6 py-4 text-center text-slate-400 text-sm">
+                        <td colspan="8" class="px-6 py-8 text-center text-slate-400 text-sm"> {{-- Colspan diubah ke 8 --}}
                             Belum ada jadwal.
                         </td>
                     </tr>
@@ -274,7 +266,6 @@
     </div>
   </main>
 
-  <!-- FOOTER (tidak diubah) -->
   <footer class="mt-4 bg-teal-600 border-t border-teal-700 shadow-inner">
     <div class="max-w-6xl mx-auto px-4 py-4 text-center">
       <p class="text-white text-[11px] md:text-sm tracking-wide">

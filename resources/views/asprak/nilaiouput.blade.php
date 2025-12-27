@@ -16,11 +16,9 @@
 </head>
 <body class="bg-[#f5f7fb] min-h-full flex flex-col">
 
-  <!-- TOP BAR -->
   <header class="w-full bg-white border-b border-teal-50 shadow-[0_2px_6px_rgba(15,118,110,0.08)]">
     <div class="w-full px-0 py-3 flex items-center justify-between gap-4">
 
-      <!-- blok kiri -->
       <div class="flex items-stretch">
         <div class="flex items-center bg-teal-500 text-white px-5 sm:px-7 py-3 sm:py-4 rounded-br-3xl rounded-tr-3xl shadow-sm">
           <div class="flex items-center gap-3">
@@ -43,7 +41,6 @@
         </div>
       </div>
 
-      <!-- kanan: info user -->
       <div class="flex items-center justify-end flex-1 pr-0">
         @auth
             @php
@@ -150,22 +147,23 @@
               {{-- row 1 --}}
               <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label class="block text-xs font-semibold text-slate-500 mb-1.5">Lab</label>
-                  <select name="lab" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm">
-                    <option hidden selected>Pilih Lab</option>
-                    <option value="Lab Komputer 1">Lab Komputer 1</option>
-                    <option value="Lab Komputer 2">Lab Komputer 2</option>
-                  </select>
-                </div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1.5">Lab</label>
+                    <select id="lab_select" name="lab" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm">
+                      <option hidden selected value="">Pilih Lab</option>
+                      <option value="Lab SAG">Lab SAG</option>
+                      <option value="Lab ERP">Lab ERP</option>
+                      <option value="Lab EISD">Lab EISD</option>
+                      <option value="Lab EIM">Lab EIM</option>
+                      <option value="Lab EDM">Lab EDM</option>
+                    </select>
+                  </div>
 
-                <div>
-                  <label class="block text-xs font-semibold text-slate-500 mb-1.5">Praktikum</label>
-                  <select name="praktikum" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm">
-                    <option hidden selected>Pilih Praktikum</option>
-                    <option value="Pemrograman Dasar">Pemrograman Dasar</option>
-                    <option value="Basis Data">Basis Data</option>
-                  </select>
-                </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1.5">Praktikum</label>
+                    <select id="praktikum_select" name="praktikum" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm" disabled>
+                      <option hidden selected value="">Pilih Praktikum</option>
+                    </select>
+                  </div>
               </div>
 
               {{-- row 2 --}}
@@ -229,11 +227,26 @@
 
       {{-- TABEL NILAI --}}
       <div>
-        <h2 class="text-xl font-semibold text-slate-900 mb-4">Rekap Nilai Praktikum</h2>
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
+            <h2 class="text-xl font-semibold text-slate-900">Rekap Nilai Praktikum</h2>
+            
+            <div class="flex flex-wrap gap-2">
+                <select id="filter_lab" class="text-xs border border-slate-200 rounded-lg px-3 py-2 bg-white outline-none focus:ring-2 focus:ring-teal-500">
+                    <option value="">Semua Lab</option>
+                    <option value="Lab SAG">Lab SAG</option>
+                    <option value="Lab ERP">Lab ERP</option>
+                    <option value="Lab EISD">Lab EISD</option>
+                    <option value="Lab EIM">Lab EIM</option>
+                    <option value="Lab EDM">Lab EDM</option>
+                </select>
+                <input type="text" id="filter_praktikum" placeholder="Filter Praktikum..." class="text-xs border border-slate-200 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-teal-500">
+                <input type="text" id="filter_modul" placeholder="Filter Modul..." class="text-xs border border-slate-200 rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-teal-500">
+            </div>
+        </div>
 
         <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
           <div class="overflow-x-auto">
-            <table class="min-w-full text-xs sm:text-sm text-left">
+            <table class="min-w-full text-xs sm:text-sm text-left" id="table_nilai">
               <thead class="bg-slate-50 text-slate-600">
                 <tr>
                   <th class="px-4 py-3 border-b">No</th>
@@ -252,14 +265,14 @@
 
               <tbody class="divide-y divide-slate-100">
                 @forelse($nilai as $index => $row)
-                  <tr class="hover:bg-slate-50/60">
-                    <td class="px-4 py-3">{{ $index + 1 }}</td>
-                    <td class="px-4 py-3">{{ $row->lab }}</td>
-                    <td class="px-4 py-3">{{ $row->praktikum }}</td>
+                  <tr class="hover:bg-slate-50/60 table-row-item">
+                    <td class="px-4 py-3 row-number">{{ $index + 1 }}</td>
+                    <td class="px-4 py-3 col-lab">{{ $row->lab }}</td>
+                    <td class="px-4 py-3 col-praktikum">{{ $row->praktikum }}</td>
                     <td class="px-4 py-3">{{ $row->kelas }}</td>
                     <td class="px-4 py-3 font-mono text-xs">{{ $row->nim }}</td>
                     <td class="px-4 py-3">{{ $row->nama_lengkap }}</td>
-                    <td class="px-4 py-3">{{ $row->modul }}</td>
+                    <td class="px-4 py-3 col-modul">{{ $row->modul }}</td>
                     <td class="px-4 py-3 font-semibold">{{ $row->nilai_total }}</td>
 
                     <td class="px-4 py-3">
@@ -280,14 +293,11 @@
                     {{-- KOLUM AKSI --}}
                     <td class="px-4 py-3">
                       <div class="flex items-center gap-3">
-
-                        {{-- Edit --}}
                         <a href="{{ route('asprak.nilai.edit', $row->id) }}"
                            class="text-blue-600 text-xs hover:underline">
                           Edit
                         </a>
 
-                        {{-- Hapus --}}
                         <form action="{{ route('asprak.nilai.destroy', $row->id) }}"
                               method="POST"
                               onsubmit="return confirm('Yakin ingin menghapus data ini?')">
@@ -297,14 +307,11 @@
                               Hapus
                             </button>
                         </form>
-
                       </div>
                     </td>
-
                   </tr>
-
                 @empty
-                  <tr>
+                  <tr id="no-data-row">
                     <td colspan="11" class="px-4 py-5 text-center text-slate-400 text-xs">
                       Belum ada data nilai.
                     </td>
@@ -330,33 +337,112 @@
 
   {{-- SCRIPT FILE --}}
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const input = document.getElementById('bukti_modul');
-        const text = document.getElementById('bukti_text');
-        const badge = document.getElementById('bukti_badge');
-        const fileNameEl = document.getElementById('bukti_filename');
+  document.addEventListener('DOMContentLoaded', function () {
+    // ====== 1) SCRIPT UPLOAD (punyamu) ======
+    const input = document.getElementById('bukti_modul');
+    const text = document.getElementById('bukti_text');
+    const badge = document.getElementById('bukti_badge');
+    const fileNameEl = document.getElementById('bukti_filename');
 
-        if (!input) return;
+    if (input) {
+      input.addEventListener('change', function () {
+        if (this.files && this.files.length > 0) {
+          const file = this.files[0];
+          text.textContent = 'Bukti terupload';
+          badge.classList.remove('hidden');
 
-        input.addEventListener('change', function () {
-            if (this.files && this.files.length > 0) {
-                const file = this.files[0];
-                text.textContent = 'Bukti terupload';
-                badge.classList.remove('hidden');
+          let name = file.name;
+          if (name.length > 30) name = name.substring(0, 27) + '...';
+          fileNameEl.textContent = 'File: ' + name;
+        } else {
+          text.textContent = 'Upload Bukti';
+          badge.classList.add('hidden');
+          fileNameEl.textContent = '';
+        }
+      });
+    }
 
-                let name = file.name;
-                if (name.length > 30) name = name.substring(0, 27) + '...';
+    // ====== 2) SCRIPT LAB -> PRAKTIKUM (baru) ======
+    const labSelect = document.getElementById('lab_select');
+    const praktikumSelect = document.getElementById('praktikum_select');
 
-                fileNameEl.textContent = 'File: ' + name;
+    const praktikumByLab = {
+      "Lab SAG": ["Enterprise Architecture", "Manajemen Layanan TI", "Pemodelan Proses Bisnis"],
+      "Lab ERP": ["Supply Chain Management", "Enterprise Resource Planning", "Customer Relationship Management"],
+      "Lab EISD": ["Pemrograman Dasar", "Algoritma & Struktur Data", "Pemrograman Web"],
+      "Lab EIM": ["Jaringan Komputer", "Sistem Operasi"],
+      "Lab EDM": ["Data Mining", "Data Warehouse", "Business Intelligence"],
+    };
 
+    function resetPraktikum() {
+      praktikumSelect.innerHTML = '<option hidden selected value="">Pilih Praktikum</option>';
+      praktikumSelect.disabled = true;
+    }
+
+    function fillPraktikumOptions(labValue) {
+      const list = praktikumByLab[labValue] || [];
+      praktikumSelect.innerHTML = '<option hidden selected value="">Pilih Praktikum</option>';
+
+      if (list.length === 0) {
+        praktikumSelect.disabled = true;
+        return;
+      }
+
+      list.forEach((item) => {
+        const opt = document.createElement('option');
+        opt.value = item;
+        opt.textContent = item;
+        praktikumSelect.appendChild(opt);
+      });
+
+      praktikumSelect.disabled = false;
+    }
+
+    if (labSelect && praktikumSelect) {
+      resetPraktikum();
+      labSelect.addEventListener('change', function () {
+        const labValue = this.value;
+        if (!labValue) return resetPraktikum();
+        fillPraktikumOptions(labValue);
+      });
+      if (labSelect.value) {
+        fillPraktikumOptions(labSelect.value);
+      }
+    }
+
+    // ====== 3) SCRIPT FILTER TABEL (BARU) ======
+    const filterLab = document.getElementById('filter_lab');
+    const filterPrak = document.getElementById('filter_praktikum');
+    const filterModul = document.getElementById('filter_modul');
+    const tableRows = document.querySelectorAll('.table-row-item');
+
+    function filterTable() {
+        const labValue = filterLab.value.toLowerCase();
+        const prakValue = filterPrak.value.toLowerCase();
+        const modulValue = filterModul.value.toLowerCase();
+
+        tableRows.forEach(row => {
+            const labText = row.querySelector('.col-lab').textContent.toLowerCase();
+            const prakText = row.querySelector('.col-praktikum').textContent.toLowerCase();
+            const modulText = row.querySelector('.col-modul').textContent.toLowerCase();
+
+            const matchLab = labValue === "" || labText.includes(labValue);
+            const matchPrak = prakValue === "" || prakText.includes(prakValue);
+            const matchModul = modulValue === "" || modulText.includes(modulValue);
+
+            if (matchLab && matchPrak && matchModul) {
+                row.style.display = "";
             } else {
-                text.textContent = 'Upload Bukti';
-                badge.classList.add('hidden');
-                fileNameEl.textContent = '';
+                row.style.display = "none";
             }
         });
-    });
-  </script>
+    }
+
+    filterLab.addEventListener('change', filterTable);
+    filterPrak.addEventListener('input', filterTable);
+    filterModul.addEventListener('input', filterTable);
+  });
+</script>
 
 </body>
 </html>

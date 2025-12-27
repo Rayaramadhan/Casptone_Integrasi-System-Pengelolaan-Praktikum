@@ -10,6 +10,7 @@ class ShiftSlot extends Model
 
     // 👇 WAJIB: masukkan created_by ke fillable
     protected $fillable = [
+        'lab',
         'praktikum',
         'name',
         'class_code',

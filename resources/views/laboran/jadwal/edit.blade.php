@@ -5,7 +5,6 @@
     <title>Edit Jadwal Shift - Laboran</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- FONT POPPINS -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style> body { font-family: 'Poppins', sans-serif; } </style>
 </head>
@@ -14,7 +13,6 @@
 
 <div class="max-w-3xl mx-auto py-10 px-4 flex-1">
 
-    <!-- Tombol Kembali -->
     <a href="{{ route('laboran.jadwal.index') }}"
        class="inline-flex items-center gap-2 px-4 py-2 mb-6 rounded-full text-[13px] font-medium
               border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-slate-300
@@ -26,15 +24,13 @@
         Kembali ke Jadwal
     </a>
 
-    <!-- Title -->
     <h1 class="text-3xl font-bold text-slate-900 tracking-tight">
         Edit Jadwal Shift Asisten
     </h1>
     <p class="text-sm text-slate-500 mt-1 mb-6">
-        Perbarui informasi shift asisten praktikum.
+        Perbarui informasi shift asisten praktikum. Pastikan pilihan Lab dan Praktikum sudah benar.
     </p>
 
-    <!-- FORM WRAPPER -->
     <div class="rounded-[26px] bg-gradient-to-br from-[#0d9488]/18 via-white to-[#0d9488]/8 p-[1px]
                 shadow-[0_12px_36px_rgba(15,23,42,0.08)]">
 
@@ -45,21 +41,37 @@
             @csrf
             @method('PUT')
 
-            <!-- Nama Praktikum -->
-            <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1">
-                    Nama Praktikum
-                </label>
-                <input type="text" name="praktikum"
-                       value="{{ old('praktikum', $slot->praktikum) }}"
-                       class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm
-                              focus:ring-2 focus:ring-[#0d9488] focus:border-[#0d9488] transition">
-                @error('praktikum')
-                <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p>
-                @enderror
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Pilih Lab</label>
+                    <select id="lab_select" name="lab" 
+                            class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm
+                                   focus:ring-2 focus:ring-[#0d9488] focus:border-[#0d9488] transition appearance-none bg-white">
+                        <option value="" hidden>Pilih Lab...</option>
+                        <option value="Lab SAG" {{ old('lab', $slot->lab) == 'Lab SAG' ? 'selected' : '' }}>Lab SAG</option>
+                        <option value="Lab ERP" {{ old('lab', $slot->lab) == 'Lab ERP' ? 'selected' : '' }}>Lab ERP</option>
+                        <option value="Lab EISD" {{ old('lab', $slot->lab) == 'Lab EISD' ? 'selected' : '' }}>Lab EISD</option>
+                        <option value="Lab EIM" {{ old('lab', $slot->lab) == 'Lab EIM' ? 'selected' : '' }}>Lab EIM</option>
+                        <option value="Lab EDM" {{ old('lab', $slot->lab) == 'Lab EDM' ? 'selected' : '' }}>Lab EDM</option>
+                    </select>
+                    @error('lab')
+                        <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Praktikum</label>
+                    <select id="praktikum_select" name="praktikum" 
+                            class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm
+                                   focus:ring-2 focus:ring-[#0d9488] focus:border-[#0d9488] transition appearance-none bg-white disabled:bg-slate-100">
+                        <option value="" hidden>Pilih Praktikum...</option>
+                    </select>
+                    @error('praktikum')
+                        <p class="text-[11px] text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
-            <!-- Nama shift & Kelas -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Shift</label>
@@ -84,7 +96,6 @@
                 </div>
             </div>
 
-            <!-- Tanggal & Jam -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Tanggal</label>
@@ -120,7 +131,6 @@
                 </div>
             </div>
 
-            <!-- Kuota -->
             <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">Kuota Asisten</label>
                 <input type="number" name="capacity" min="1"
@@ -132,7 +142,6 @@
                 @enderror
             </div>
 
-            <!-- Tombol -->
             <div class="pt-3 flex justify-end gap-3">
                 <a href="{{ route('laboran.jadwal.index') }}"
                    class="px-4 py-2 rounded-lg border border-slate-200 text-xs font-medium
@@ -150,6 +159,57 @@
         </form>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const labSelect = document.getElementById('lab_select');
+        const praktikumSelect = document.getElementById('praktikum_select');
+
+        // Data Praktikum sesuai Lab
+        const praktikumByLab = {
+            "Lab SAG": ["Enterprise Architecture", "Manajemen Layanan TI", "Pemodelan Proses Bisnis"],
+            "Lab ERP": ["Supply Chain Management", "Enterprise Resource Planning", "Customer Relationship Management"],
+            "Lab EISD": ["Pemrograman Dasar", "Algoritma & Struktur Data", "Pemrograman Web"],
+            "Lab EIM": ["Jaringan Komputer", "Sistem Operasi"],
+            "Lab EDM": ["Data Mining", "Data Warehouse", "Business Intelligence"],
+        };
+
+        function fillPraktikumOptions(labValue, selectedValue = "") {
+            const list = praktikumByLab[labValue] || [];
+            praktikumSelect.innerHTML = '<option value="" hidden>Pilih Praktikum...</option>';
+
+            if (list.length === 0) {
+                praktikumSelect.disabled = true;
+                return;
+            }
+
+            list.forEach((item) => {
+                const opt = document.createElement('option');
+                opt.value = item;
+                opt.textContent = item;
+                // Jika item sama dengan data yang tersimpan di DB atau old value, tandai sebagai selected
+                if (item === selectedValue) {
+                    opt.selected = true;
+                }
+                praktikumSelect.appendChild(opt);
+            });
+
+            praktikumSelect.disabled = false;
+        }
+
+        // Listener saat Lab diubah manual
+        labSelect.addEventListener('change', function () {
+            fillPraktikumOptions(this.value);
+        });
+
+        // Jalankan saat halaman dimuat untuk pertama kali (mengambil data dari Database)
+        if (labSelect.value) {
+            // Urutan prioritas selected: 1. Old value (jika error submit), 2. Data asli Database
+            const currentSelected = "{{ old('praktikum', $slot->praktikum) }}";
+            fillPraktikumOptions(labSelect.value, currentSelected);
+        }
+    });
+</script>
 
 </body>
 </html>

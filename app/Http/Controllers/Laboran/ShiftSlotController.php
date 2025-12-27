@@ -19,8 +19,9 @@ class ShiftSlotController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('praktikum', 'like', "%{$search}%")
-                  ->orWhere('name', 'like', "%{$search}%")
-                  ->orWhere('class_code', 'like', "%{$search}%");
+                ->orWhere('lab', 'like', "%{$search}%") // Tambahkan search by lab
+                ->orWhere('name', 'like', "%{$search}%")
+                ->orWhere('class_code', 'like', "%{$search}%");
             });
         }
 
@@ -40,6 +41,7 @@ class ShiftSlotController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'lab'        => ['required', 'string', 'max:50'],
             'praktikum'  => ['required', 'string', 'max:191'],
             'name'       => ['required', 'string', 'max:50'],
             'class_code' => ['required', 'string', 'max:50'],
